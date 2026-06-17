@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:ora_task_1/core/wrappers/screen_util_wrapper.dart';
 
-import 'core/theme/typography/app_typography.dart';
+import 'core/theme/colors/app_colors.dart';
+import 'core/wrappers/screen_util_wrapper.dart';
+import 'features/todo/presentation/views/todo_view.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -10,14 +11,13 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScreenUtilWrapper(
       child: MaterialApp(
+        title: 'My Tasks',
         debugShowCheckedModeBanner: false,
-        title: 'My App',
-        home: Scaffold(
-          appBar: AppBar(title: Text('My App', style: AppTypography.bold28)),
-          body: Center(
-            child: Text('Hello, World!', style: AppTypography.bold28),
-          ),
+        theme: ThemeData(
+          useMaterial3: true,
+          colorSchemeSeed: AppColors.primary,
         ),
+        home: const TodoView(),
       ),
     );
   }

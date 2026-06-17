@@ -45,5 +45,6 @@ app.*.map.json
 /android/app/release
 
 AGENTS.md
+.opencode
 
 
