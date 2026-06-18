@@ -1,13 +1,6 @@
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
 abstract class HiveStorageService {
-  static const String boxName = 'tasks';
-
-  static Future<void> init() async {
-    await Hive.initFlutter();
-    await Hive.openBox<dynamic>(boxName);
-  }
-
   Future<void> write<T>(String key, T value);
 
   T? read<T>(String key);
@@ -20,7 +13,16 @@ abstract class HiveStorageService {
 }
 
 class HiveStorageServiceImpl implements HiveStorageService {
-  Box<dynamic> get _box => Hive.box<dynamic>(HiveStorageService.boxName);
+  HiveStorageServiceImpl(this.boxName);
+
+  final String boxName;
+
+  static Future<void> init(String boxName) async {
+    await Hive.initFlutter();
+    await Hive.openBox<dynamic>(boxName);
+  }
+
+  Box<dynamic> get _box => Hive.box<dynamic>(boxName);
 
   @override
   Future<void> write<T>(String key, T value) async {

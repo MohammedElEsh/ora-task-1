@@ -26,7 +26,11 @@ class TodoCubit extends Cubit<TodoState> {
 
   Future<void> addTask(String title) async {
     if (title.trim().isEmpty) return;
-    final task = TaskModel(id: const Uuid().v4(), title: title.trim());
+    final task = TaskModel(
+      id: const Uuid().v4(),
+      title: title.trim(),
+      createdAt: DateTime.now(),
+    );
     LoggerService.d('Adding task: ${task.title}', tag: 'TodoCubit');
     await _repository.addTask(task);
     loadTasks();

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 abstract class AppTypography {
@@ -9,7 +10,7 @@ abstract class AppTypography {
     double letterSpacing = 0,
   }) {
     return GoogleFonts.habibi(
-      fontSize: fontSize,
+      fontSize: fontSize.sp,
       fontWeight: fontWeight,
       height: height,
       letterSpacing: letterSpacing,

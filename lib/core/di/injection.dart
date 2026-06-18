@@ -8,7 +8,7 @@ import '../services/storage/hive_storage_service.dart';
 final sl = GetIt.instance;
 
 void initDependencies() {
-  sl.registerSingleton<HiveStorageService>(HiveStorageServiceImpl());
+  sl.registerSingleton<HiveStorageService>(HiveStorageServiceImpl('tasks'));
   sl.registerSingleton<TaskRepository>(TaskRepositoryImpl());
   sl.registerFactory<TodoCubit>(() => TodoCubit(sl<TaskRepository>()));
 }

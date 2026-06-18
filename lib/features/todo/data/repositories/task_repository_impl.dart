@@ -12,7 +12,7 @@ class TaskRepositoryImpl implements TaskRepository {
       (e) => Map<String, dynamic>.from(e as Map),
     );
     return data.map((e) => TaskModel.fromMap(e)).toList()
-      ..sort((a, b) => a.title.compareTo(b.title));
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
 
   @override
