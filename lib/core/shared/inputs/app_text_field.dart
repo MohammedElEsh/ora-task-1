@@ -41,6 +41,12 @@ class AppTextField extends StatefulWidget {
     this.fillColor,
     this.textStyle,
     this.hintStyle,
+    this.border,
+    this.enabledBorder,
+    this.focusedBorder,
+    this.errorBorder,
+    this.focusedErrorBorder,
+    this.disabledBorder,
   });
 
   final TextEditingController? controller;
@@ -90,6 +96,12 @@ class AppTextField extends StatefulWidget {
   final Color? fillColor;
   final TextStyle? textStyle;
   final TextStyle? hintStyle;
+  final InputBorder? border;
+  final InputBorder? enabledBorder;
+  final InputBorder? focusedBorder;
+  final InputBorder? errorBorder;
+  final InputBorder? focusedErrorBorder;
+  final InputBorder? disabledBorder;
 
   @override
   State<AppTextField> createState() => _AppTextFieldState();
@@ -180,12 +192,12 @@ class _AppTextFieldState extends State<AppTextField> {
         fillColor: widget.fillColor ?? theme.fillColor,
         contentPadding: widget.contentPadding ?? theme.contentPadding,
         hintStyle: widget.hintStyle ?? theme.hintStyle,
-        border: theme.border,
-        enabledBorder: theme.enabledBorder,
-        focusedBorder: theme.focusedBorder,
-        errorBorder: theme.errorBorder,
-        focusedErrorBorder: theme.focusedErrorBorder,
-        disabledBorder: theme.disabledBorder,
+        border: widget.border ?? theme.border,
+        enabledBorder: widget.enabledBorder ?? theme.enabledBorder,
+        focusedBorder: widget.focusedBorder ?? theme.focusedBorder,
+        errorBorder: widget.errorBorder ?? theme.errorBorder,
+        focusedErrorBorder: widget.focusedErrorBorder ?? theme.focusedErrorBorder,
+        disabledBorder: widget.disabledBorder ?? theme.disabledBorder,
         counterText: '',
       ),
     );

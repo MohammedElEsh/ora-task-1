@@ -19,7 +19,7 @@ class TodoView extends StatelessWidget {
     return BlocProvider(
       create: (context) => sl<TodoCubit>()..loadTasks(),
       child: Scaffold(
-        backgroundColor: AppColors.backgroundDark,
+        backgroundColor: AppColors.background,
         extendBody: true,
         body: SafeArea(
           child: Stack(
@@ -73,7 +73,7 @@ class TodoView extends StatelessWidget {
           SizedBox(height: 20.h),
           Text(
             'No tasks yet',
-            style: AppTypography.semiBold20.copyWith(color: Colors.white),
+            style: AppTypography.semiBold20.copyWith(color: AppColors.textPrimary),
           ),
           SizedBox(height: 8.h),
           Text(

@@ -27,9 +27,9 @@ class TaskTile extends StatelessWidget {
           blurSigma: 12,
           borderRadius: 16,
           backgroundColor: task.isCompleted
-              ? AppColors.surfaceDark40
-              : AppColors.surfaceDark60,
-          borderColor: AppColors.white6,
+              ? AppColors.primary10
+              : AppColors.surface,
+          borderColor: AppColors.border,
           padding: EdgeInsets.zero,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(16.r),
@@ -61,7 +61,7 @@ class TaskTile extends StatelessWidget {
                               border: task.isCompleted
                                   ? null
                                   : Border.all(
-                                      color: AppColors.white20,
+                                      color: AppColors.border,
                                       width: 1.5,
                                     ),
                             ),
@@ -80,8 +80,8 @@ class TaskTile extends StatelessWidget {
                             task.title,
                             style: AppTypography.regular14.copyWith(
                               color: task.isCompleted
-                                  ? AppColors.white30
-                                  : AppColors.white90,
+                                  ? AppColors.textTertiary
+                                  : AppColors.textPrimary,
                               decoration: task.isCompleted
                                   ? TextDecoration.lineThrough
                                   : null,
@@ -95,12 +95,12 @@ class TaskTile extends StatelessWidget {
                             width: 32.r,
                             height: 32.r,
                             decoration: const BoxDecoration(
-                              color: AppColors.white3,
+                              color: AppColors.grey100,
                               shape: BoxShape.circle,
                             ),
                             child: Icon(
                               Icons.close_rounded,
-                              color: AppColors.error70,
+                              color: AppColors.error,
                               size: 16.r,
                             ),
                           ),
@@ -121,10 +121,10 @@ class TaskTile extends StatelessWidget {
     return Container(
       alignment: Alignment.centerRight,
       padding: EdgeInsets.only(right: 20.w),
-      decoration: BoxDecoration(
-        color: AppColors.error15,
-        borderRadius: BorderRadius.circular(16.r),
-      ),
+        decoration: BoxDecoration(
+          color: AppColors.error10,
+          borderRadius: BorderRadius.circular(16.r),
+        ),
       child: const Icon(Icons.delete_outline_rounded, color: AppColors.error),
     );
   }

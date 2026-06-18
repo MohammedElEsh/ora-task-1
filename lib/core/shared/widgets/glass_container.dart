@@ -1,5 +1,7 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:ora_task_1/core/theme/colors/app_colors.dart';
 
 class GlassContainer extends StatelessWidget {
   final Widget child;
@@ -15,7 +17,7 @@ class GlassContainer extends StatelessWidget {
     required this.child,
     this.blurSigma = 12,
     this.borderRadius = 16,
-    this.backgroundColor = const Color(0x0FFFFFFF),
+    this.backgroundColor = AppColors.white6,
     this.borderColor,
     this.padding = EdgeInsets.zero,
     this.margin,
