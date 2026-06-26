@@ -26,147 +26,114 @@ class ScannerView extends StatefulWidget {
 
 class _ScannerViewState extends State<ScannerView> {
   static const _tag = 'ScannerView';
-  late MobileScannerController _controller;
+  late MobileScannerController _camera;
   late final ScannerCubit _cubit;
-  bool _isScannerActive = true;
-  bool _isProcessing = false;
-  Timer? _resultTimer;
-  Timer? _cooldownTimer;
-
-  Color _frameBorderColor = Colors.white;
+  bool _processing = false;
+  Timer? _resetTimer;
+  Color _borderColor = Colors.white;
 
   @override
   void initState() {
     super.initState();
-    LoggerService.i('ScannerView initialized', tag: _tag);
+    LoggerService.i('Initialized', tag: _tag);
     _cubit = context.read<ScannerCubit>();
-    _controller = MobileScannerController(
+    _camera = MobileScannerController(
       detectionSpeed: DetectionSpeed.normal,
       facing: CameraFacing.back,
       torchEnabled: false,
       autoStart: true,
     );
-    _isScannerActive = true;
+    LoggerService.d('Camera controller created', tag: _tag);
     _cubit.loadStats();
   }
 
   @override
   void dispose() {
-    LoggerService.d('ScannerView disposed', tag: _tag);
-    _resultTimer?.cancel();
-    _cooldownTimer?.cancel();
-    _controller.dispose();
+    LoggerService.d('Disposed', tag: _tag);
+    _resetTimer?.cancel();
+    _camera.dispose();
     super.dispose();
   }
 
-  void _onBarcodeDetected(BarcodeCapture capture) {
-    if (_isProcessing) return;
-    final barcode = capture.barcodes.firstOrNull;
-    if (barcode == null || barcode.rawValue == null) return;
-    LoggerService.d('Barcode detected: ${barcode.rawValue}', tag: _tag);
-    _processBarcode(barcode.rawValue!);
-  }
-
-  void _processBarcode(String code) {
-    if (_isProcessing) return;
-    LoggerService.i('Processing barcode: $code', tag: _tag);
-    setState(() => _isProcessing = true);
+  void _onDetect(BarcodeCapture capture) {
+    if (_processing) {
+      LoggerService.d('Scan ignored (processing)', tag: _tag);
+      return;
+    }
+    final code = capture.barcodes.firstOrNull?.rawValue;
+    if (code == null || code.isEmpty) {
+      LoggerService.d('No barcode in capture', tag: _tag);
+      return;
+    }
+    LoggerService.i('Barcode detected: "$code"', tag: _tag);
+    setState(() => _processing = true);
     _cubit.onBarcodeScanned(code);
   }
 
-  void _playFeedback(ScannerState state) {
-    if (state is ScanAccepted) {
-      HapticFeedback.mediumImpact();
-    } else {
-      HapticFeedback.vibrate();
+  void _onScanResult(ScannerState state) {
+    LoggerService.d('State change: ${state.runtimeType}', tag: _tag);
+
+    if (state is ScannerInitial) {
+      setState(() => _borderColor = Colors.white);
+      LoggerService.d('Border → white (initial)', tag: _tag);
+      return;
     }
+    if (state is ScannerStatsLoaded) {
+      LoggerService.d('Stats loaded: today=${state.todayScanned}, used=${state.used}', tag: _tag);
+      return;
+    }
+
+    HapticFeedback.vibrate();
+
+    final color = switch (state) {
+      ScanAccepted() => AppColors.validGreen,
+      ScanAlreadyUsed() || ScanError() => AppColors.deniedRed,
+      ScanNotFound() => AppColors.invalidOrange,
+      _ => Colors.white,
+    };
+    LoggerService.d('Border → ${color == AppColors.validGreen ? "green" : color == AppColors.deniedRed ? "red" : "orange"}', tag: _tag);
+    setState(() => _borderColor = color);
+
+    _resetTimer?.cancel();
+    _resetTimer = Timer(const Duration(seconds: 3), () {
+      LoggerService.d('Reset timer fired, resetting scanner', tag: _tag);
+      if (!mounted) return;
+      _cubit.resetScanner();
+      _cubit.loadStats();
+      Future.delayed(const Duration(seconds: 1), () {
+        LoggerService.d('Cooldown complete, re-enabling scanner', tag: _tag);
+        if (mounted) setState(() => _processing = false);
+      });
+    });
   }
 
-  void _resetScan() {
-    LoggerService.d('Resetting scanner', tag: _tag);
+  void _dismiss() {
+    LoggerService.d('Result dismissed by user', tag: _tag);
     _cubit.resetScanner();
-    setState(() {
-      _isProcessing = false;
-    });
+    setState(() => _processing = false);
   }
 
   @override
   Widget build(BuildContext context) {
+    LoggerService.d('Building UI', tag: _tag);
     return Scaffold(
       backgroundColor: Colors.black,
       body: BlocListener<ScannerCubit, ScannerState>(
-        listener: (context, state) {
-          LoggerService.d('State changed: ${state.runtimeType}', tag: _tag);
-          if (state is ScannerInitial) {
-            setState(() {
-              _frameBorderColor = Colors.white;
-            });
-          } else if (state is ScannerStatsLoaded) {
-            return;
-          } else if (state is ScanAccepted ||
-              state is ScanAlreadyUsed ||
-              state is ScanNotFound ||
-              state is ScanError) {
-            _playFeedback(state);
-
-            Color newBorder;
-            if (state is ScanAccepted) {
-              newBorder = AppColors.validGreen;
-            } else if (state is ScanAlreadyUsed || state is ScanError) {
-              newBorder = AppColors.deniedRed;
-            } else {
-              newBorder = AppColors.invalidOrange;
-            }
-
-            setState(() {
-              _frameBorderColor = newBorder;
-            });
-
-            _resultTimer?.cancel();
-            _resultTimer = Timer(const Duration(seconds: 3), () {
-              if (!mounted) return;
-              _cubit.resetScanner();
-              _cubit.loadStats();
-              _cooldownTimer?.cancel();
-              _cooldownTimer = Timer(const Duration(seconds: 1), () {
-                if (mounted) {
-                  setState(() {
-                    _isProcessing = false;
-                    _frameBorderColor = Colors.white;
-                  });
-                }
-              });
-            });
-          }
-        },
+        listener: (context, state) => _onScanResult(state),
         child: BlocBuilder<ScannerCubit, ScannerState>(
           builder: (context, state) {
-            final scannedToday = state is ScannerStatsLoaded ? state.todayScanned : 0;
-            final totalScanned = state is ScannerStatsLoaded ? state.used : 0;
+            final today = state is ScannerStatsLoaded ? state.todayScanned : 0;
+            final total = state is ScannerStatsLoaded ? state.used : 0;
+            final isIdle = state is ScannerInitial || state is ScannerLoading;
 
             return Stack(
               children: [
                 Positioned.fill(
-                  child: _isScannerActive
-                      ? MobileScanner(
-                          controller: _controller,
-                          onDetect: _onBarcodeDetected,
-                        )
-                      : Container(
-                          color: Colors.black,
-                          child: Center(
-                            child: Icon(
-                              Icons.videocam_off_outlined,
-                              color: Colors.white38,
-                              size: 48.r,
-                            ),
-                          ),
-                        ),
+                  child: MobileScanner(controller: _camera, onDetect: _onDetect),
                 ),
-                if (_isScannerActive)
-                  Positioned.fill(
-                    child: ScanOverlay(borderColor: _frameBorderColor),
-                  ),
+                Positioned.fill(
+                  child: ScanOverlay(borderColor: _borderColor),
+                ),
                 Positioned(
                   top: MediaQuery.of(context).padding.top + 8.h,
                   left: 0,
@@ -175,48 +142,51 @@ class _ScannerViewState extends State<ScannerView> {
                     eventName: 'Music Festival 2026',
                     location: 'Main Gate',
                     pendingSyncCount: 0,
-                    onBack: () => Navigator.pop(context),
+                    onBack: () {
+                      LoggerService.d('Back pressed', tag: _tag);
+                      Navigator.pop(context);
+                    },
                   ),
                 ),
+                if (isIdle)
+                  Positioned(
+                    top: MediaQuery.of(context).padding.top + 70.h,
+                    left: 0,
+                    right: 0,
+                    child: const ScanInstruction(),
+                  ),
                 Positioned(
-                  top: MediaQuery.of(context).padding.top + 70.h,
-                  left: 0,
-                  right: 0,
-                  child: (state is ScannerInitial || state is ScannerLoading)
-                      ? const ScanInstruction()
-                      : const SizedBox.shrink(),
-                ),
-                AnimatedPositioned(
-                  duration: const Duration(milliseconds: 350),
-                  curve: Curves.easeOutCubic,
                   left: 20.w,
                   right: 20.w,
-                  bottom: (state is ScannerInitial || state is ScannerLoading)
-                      ? -180.h
-                      : MediaQuery.of(context).padding.bottom + 100.h,
-                  child: ScanResultOverlay(state: state, onDismiss: _resetScan),
+                  bottom: isIdle ? -180.h : MediaQuery.of(context).padding.bottom + 100.h,
+                  child: ScanResultOverlay(state: state, onDismiss: _dismiss),
                 ),
                 Positioned(
                   bottom: 0,
                   left: 0,
                   right: 0,
                   child: ScannerBottomBar(
-                    isTorchOn: _controller.value.torchState == TorchState.on,
-                    scannedToday: scannedToday,
-                    totalScanned: totalScanned,
+                    isTorchOn: _camera.value.torchState == TorchState.on,
+                    scannedToday: today,
+                    totalScanned: total,
                     onToggleTorch: () async {
-                      await _controller.toggleTorch();
+                      LoggerService.d('Torch toggle', tag: _tag);
+                      await _camera.toggleTorch();
                       setState(() {});
                     },
                     onTestTap: () async {
+                      LoggerService.d('Test QR tapped, opening bottom sheet', tag: _tag);
                       final code = await showModalBottomSheet<String>(
                         context: context,
                         backgroundColor: Colors.transparent,
                         isScrollControlled: true,
                         builder: (_) => const TestQrView(),
                       );
+                      LoggerService.d('Bottom sheet returned: "$code"', tag: _tag);
                       if (code != null && mounted) {
-                        _processBarcode(code);
+                        LoggerService.i('Processing test barcode: "$code"', tag: _tag);
+                        setState(() => _processing = true);
+                        _cubit.onBarcodeScanned(code);
                       }
                     },
                   ),

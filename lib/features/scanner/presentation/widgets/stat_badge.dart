@@ -21,26 +21,14 @@ class StatBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(8.r),
-      ),
+      decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(8.r)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            '$count',
-            style: AppTypography.semiBold14.copyWith(color: color),
-          ),
+          Text('$count', style: AppTypography.semiBold14.copyWith(color: color)),
           SizedBox(width: 4.w),
-          Flexible(
-            child: Text(
-              label,
-              style: AppTypography.regular12.copyWith(color: color),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
+          Flexible(child: Text(label, style: AppTypography.regular12.copyWith(color: color), overflow: TextOverflow.ellipsis)),
         ],
       ),
     );

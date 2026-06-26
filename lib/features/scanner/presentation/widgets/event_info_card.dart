@@ -29,8 +29,6 @@ class EventInfoCard extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [AppColors.primary, AppColors.primaryDark],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
@@ -52,45 +50,21 @@ class EventInfoCard extends StatelessWidget {
                   color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(6.r),
                 ),
-                child: Text(
-                  'LIVE EVENT',
-                  style: AppTypography.medium10.copyWith(
-                    color: Colors.white,
-                    letterSpacing: 1,
-                  ),
-                ),
+                child: Text('LIVE EVENT', style: AppTypography.medium10.copyWith(color: Colors.white, letterSpacing: 1)),
               ),
               const Spacer(),
-              Icon(
-                Icons.verified_rounded,
-                color: Colors.white.withValues(alpha: 0.9),
-                size: 20.r,
-              ),
+              Icon(Icons.verified_rounded, color: Colors.white.withValues(alpha: 0.9), size: 20.r),
             ],
           ),
           SizedBox(height: 16.h),
-          Text(
-            eventName,
-            style: AppTypography.semiBold20.copyWith(color: Colors.white),
-          ),
+          Text(eventName, style: AppTypography.semiBold20.copyWith(color: Colors.white)),
           SizedBox(height: 8.h),
           Row(
             children: [
-              Icon(
-                Icons.location_on_outlined,
-                color: Colors.white70,
-                size: 14.r,
-              ),
+              Icon(Icons.location_on_outlined, color: Colors.white70, size: 14.r),
               SizedBox(width: 6.w),
               Expanded(
-                child: Text(
-                  venue,
-                  style: AppTypography.regular14.copyWith(
-                    color: Colors.white70,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                child: Text(venue, style: AppTypography.regular14.copyWith(color: Colors.white70), maxLines: 1, overflow: TextOverflow.ellipsis),
               ),
             ],
           ),

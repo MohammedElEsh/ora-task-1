@@ -7,10 +7,7 @@ import 'test_qr_ticket_row.dart';
 class TestQrTicketList extends StatelessWidget {
   final List<BarcodeModel> barcodes;
 
-  const TestQrTicketList({
-    super.key,
-    required this.barcodes,
-  });
+  const TestQrTicketList({super.key, required this.barcodes});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +16,7 @@ class TestQrTicketList extends StatelessWidget {
       physics: const ClampingScrollPhysics(),
       padding: EdgeInsets.symmetric(horizontal: 20.w),
       itemCount: barcodes.length + 1,
-      separatorBuilder: (context, index) => SizedBox(height: 8.h),
+      separatorBuilder: (_, __) => SizedBox(height: 8.h),
       itemBuilder: (context, index) {
         if (index == barcodes.length) {
           return TestQrTicketRow(

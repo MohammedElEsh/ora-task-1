@@ -16,10 +16,7 @@ class InfoChip extends StatelessWidget {
       children: [
         Icon(icon, color: Colors.white60, size: 12.r),
         SizedBox(width: 6.w),
-        Text(
-          label,
-          style: AppTypography.regular12.copyWith(color: Colors.white70),
-        ),
+        Text(label, style: AppTypography.regular12.copyWith(color: Colors.white70)),
       ],
     );
   }

@@ -12,25 +12,11 @@ class ScanInstruction extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 40.w),
       child: Column(
         children: [
-          Icon(
-            Icons.center_focus_strong_rounded,
-            color: Colors.white.withValues(alpha: 0.8),
-            size: 32.r,
-          ),
+          Icon(Icons.center_focus_strong_rounded, color: Colors.white70, size: 32.r),
           SizedBox(height: 8.h),
-          Text(
-            'Align QR code within the frame',
-            style: AppTypography.medium14.copyWith(
-              color: Colors.white.withValues(alpha: 0.9),
-            ),
-            textAlign: TextAlign.center,
-          ),
+          Text('Align QR code within the frame', style: AppTypography.medium14.copyWith(color: Colors.white70), textAlign: TextAlign.center),
           SizedBox(height: 4.h),
-          Text(
-            'Hold steady for automatic detection',
-            style: AppTypography.regular12.copyWith(color: Colors.white60),
-            textAlign: TextAlign.center,
-          ),
+          Text('Hold steady for automatic detection', style: AppTypography.regular12.copyWith(color: Colors.white60), textAlign: TextAlign.center),
         ],
       ),
     );

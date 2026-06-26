@@ -28,12 +28,8 @@ class StatCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(14.r),
         border: Border.all(color: AppColors.grey100),
-        boxShadow: [
-          const BoxShadow(
-            color: AppColors.shadowLight,
-            blurRadius: 10,
-            offset: Offset(0, 2),
-          ),
+        boxShadow: const [
+          BoxShadow(color: AppColors.shadowLight, blurRadius: 10, offset: Offset(0, 2)),
         ],
       ),
       child: Column(
@@ -42,22 +38,13 @@ class StatCard extends StatelessWidget {
           Container(
             width: 36.r,
             height: 36.r,
-            decoration: BoxDecoration(
-              color: bgColor,
-              borderRadius: BorderRadius.circular(10.r),
-            ),
+            decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(10.r)),
             child: Icon(icon, color: color, size: 18.r),
           ),
           SizedBox(height: 12.h),
-          Text(
-            value,
-            style: AppTypography.bold28.copyWith(color: AppColors.grey900),
-          ),
+          Text(value, style: AppTypography.bold28),
           SizedBox(height: 4.h),
-          Text(
-            title,
-            style: AppTypography.regular12.copyWith(color: AppColors.grey500),
-          ),
+          Text(title, style: AppTypography.regular12.copyWith(color: AppColors.grey500)),
         ],
       ),
     );

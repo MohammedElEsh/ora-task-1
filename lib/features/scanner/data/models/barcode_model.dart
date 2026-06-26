@@ -21,55 +21,38 @@ class BarcodeModel extends Equatable {
     required this.createdAt,
   });
 
-  BarcodeModel copyWith({
-    int? id,
-    String? code,
-    String? eventName,
-    String? holderName,
-    String? ticketType,
-    bool? isUsed,
-    DateTime? usedAt,
-    DateTime? createdAt,
-  }) {
-    return BarcodeModel(
-      id: id ?? this.id,
-      code: code ?? this.code,
-      eventName: eventName ?? this.eventName,
-      holderName: holderName ?? this.holderName,
-      ticketType: ticketType ?? this.ticketType,
-      isUsed: isUsed ?? this.isUsed,
-      usedAt: usedAt ?? this.usedAt,
-      createdAt: createdAt ?? this.createdAt,
-    );
-  }
+  BarcodeModel copyWith({bool? isUsed, DateTime? usedAt}) => BarcodeModel(
+    id: id,
+    code: code,
+    eventName: eventName,
+    holderName: holderName,
+    ticketType: ticketType,
+    isUsed: isUsed ?? this.isUsed,
+    usedAt: usedAt ?? this.usedAt,
+    createdAt: createdAt,
+  );
 
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'code': code,
-      'event_name': eventName,
-      'holder_name': holderName,
-      'ticket_type': ticketType,
-      'is_used': isUsed ? 1 : 0,
-      'used_at': usedAt?.millisecondsSinceEpoch,
-      'created_at': createdAt.millisecondsSinceEpoch,
-    };
-  }
+  Map<String, dynamic> toMap() => {
+    'id': id,
+    'code': code,
+    'event_name': eventName,
+    'holder_name': holderName,
+    'ticket_type': ticketType,
+    'is_used': isUsed ? 1 : 0,
+    'used_at': usedAt?.millisecondsSinceEpoch,
+    'created_at': createdAt.millisecondsSinceEpoch,
+  };
 
-  factory BarcodeModel.fromMap(Map<String, dynamic> map) {
-    return BarcodeModel(
-      id: map['id'] as int?,
-      code: map['code'] as String,
-      eventName: map['event_name'] as String,
-      holderName: (map['holder_name'] as String?) ?? '',
-      ticketType: (map['ticket_type'] as String?) ?? '',
-      isUsed: (map['is_used'] as int) == 1,
-      usedAt: map['used_at'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map['used_at'] as int)
-          : null,
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
-    );
-  }
+  factory BarcodeModel.fromMap(Map<String, dynamic> m) => BarcodeModel(
+    id: m['id'] as int?,
+    code: m['code'] as String,
+    eventName: m['event_name'] as String,
+    holderName: (m['holder_name'] as String?) ?? '',
+    ticketType: (m['ticket_type'] as String?) ?? '',
+    isUsed: (m['is_used'] as int) == 1,
+    usedAt: m['used_at'] != null ? DateTime.fromMillisecondsSinceEpoch(m['used_at'] as int) : null,
+    createdAt: DateTime.fromMillisecondsSinceEpoch(m['created_at'] as int),
+  );
 
   @override
   List<Object?> get props => [id, code, eventName, holderName, ticketType, isUsed, usedAt, createdAt];

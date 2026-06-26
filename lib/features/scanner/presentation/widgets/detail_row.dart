@@ -9,12 +9,7 @@ class DetailRow extends StatelessWidget {
   final String label;
   final String value;
 
-  const DetailRow({
-    super.key,
-    required this.icon,
-    required this.label,
-    required this.value,
-  });
+  const DetailRow({super.key, required this.icon, required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -26,14 +21,8 @@ class DetailRow extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              value,
-              style: AppTypography.medium14.copyWith(color: AppColors.grey800),
-            ),
-            Text(
-              label,
-              style: AppTypography.regular11.copyWith(color: AppColors.grey400),
-            ),
+            Text(value, style: AppTypography.medium14.copyWith(color: AppColors.grey800)),
+            Text(label, style: AppTypography.regular11.copyWith(color: AppColors.grey400)),
           ],
         ),
       ],

@@ -9,6 +9,6 @@ void main() async {
   LoggerService.i('App starting');
   initDependencies();
   LoggerService.i('Dependencies initialized');
-
   runApp(const App());
+  LoggerService.i('App running');
 }

@@ -6,48 +6,51 @@ import 'scanner_state.dart';
 
 class ScannerCubit extends Cubit<ScannerState> {
   ScannerCubit(this._repository) : super(const ScannerInitial());
-
   final BarcodeRepository _repository;
   static const _tag = 'ScannerCubit';
 
   Future<void> loadStats() async {
-    LoggerService.d('Loading stats', tag: _tag);
+    LoggerService.d('loadStats() called', tag: _tag);
     try {
-      final stats = await _repository.getBarcodeStats();
+      final s = await _repository.getBarcodeStats();
+      LoggerService.d('Stats received: $s', tag: _tag);
       emit(ScannerStatsLoaded(
-        total: stats['total'] ?? 0,
-        used: stats['used'] ?? 0,
-        available: stats['available'] ?? 0,
-        todayScanned: stats['todayScanned'] ?? 0,
+        total: s['total'] ?? 0,
+        used: s['used'] ?? 0,
+        available: s['available'] ?? 0,
+        todayScanned: s['todayScanned'] ?? 0,
       ));
-      LoggerService.d(
-        'Stats loaded: total=${stats['total']}, used=${stats['used']}, available=${stats['available']}, today=${stats['todayScanned']}',
-        tag: _tag,
-      );
+      LoggerService.d('Emitted ScannerStatsLoaded', tag: _tag);
     } catch (e) {
-      LoggerService.e('Failed to load stats', error: e, tag: _tag);
+      LoggerService.e('loadStats failed', error: e, tag: _tag);
       emit(const ScanError('Failed to load statistics'));
     }
   }
 
   Future<void> onBarcodeScanned(String code) async {
-    if (code.isEmpty) return;
-
-    LoggerService.d('Barcode scanned: $code', tag: _tag);
+    LoggerService.i('onBarcodeScanned("$code") called', tag: _tag);
+    if (code.isEmpty) {
+      LoggerService.w('Empty code, skipping', tag: _tag);
+      return;
+    }
     emit(const ScannerLoading());
+    LoggerService.d('Emitted ScannerLoading', tag: _tag);
 
     try {
       final barcode = await _repository.findByCode(code);
+      LoggerService.d('findByCode result: ${barcode != null ? "found id=${barcode.id}" : "null"}', tag: _tag);
 
       if (barcode == null) {
         LoggerService.w('Barcode not found: $code', tag: _tag);
         emit(ScanNotFound(code));
+        LoggerService.d('Emitted ScanNotFound', tag: _tag);
         return;
       }
 
       if (barcode.isUsed) {
-        LoggerService.w('Barcode already used: $code', tag: _tag);
+        LoggerService.w('Barcode already used: $code (used at ${barcode.usedAt})', tag: _tag);
         emit(ScanAlreadyUsed(barcode));
+        LoggerService.d('Emitted ScanAlreadyUsed', tag: _tag);
         return;
       }
 
@@ -58,42 +61,41 @@ class ScannerCubit extends Cubit<ScannerState> {
         return;
       }
 
+      LoggerService.i('Marking barcode as used: id=$id, code=$code', tag: _tag);
       await _repository.markAsUsed(id);
-      final updatedBarcode = barcode.copyWith(isUsed: true);
+      final updated = barcode.copyWith(isUsed: true);
       LoggerService.i('Barcode accepted: $code', tag: _tag);
-      emit(ScanAccepted(updatedBarcode));
+      emit(ScanAccepted(updated));
+      LoggerService.d('Emitted ScanAccepted', tag: _tag);
     } catch (e) {
-      LoggerService.e('Scan error', error: e, tag: _tag);
+      LoggerService.e('Scan error for code=$code', error: e, tag: _tag);
       emit(const ScanError('Scan failed. Please try again.'));
     }
   }
 
   void resetScanner() {
+    LoggerService.d('resetScanner() called', tag: _tag);
     emit(const ScannerInitial());
+    LoggerService.d('Emitted ScannerInitial', tag: _tag);
   }
 }
 
 class TestQrCubit extends Cubit<TestQrState> {
   TestQrCubit(this._repository) : super(const TestQrInitial());
-
   final BarcodeRepository _repository;
   static const _tag = 'TestQrCubit';
 
   Future<void> loadBarcodes() async {
-    LoggerService.d('Loading barcodes', tag: _tag);
+    LoggerService.d('loadBarcodes() called', tag: _tag);
     emit(const TestQrLoading());
     try {
       final barcodes = await _repository.getAllBarcodes();
-      final availableCount = barcodes.where((b) => !b.isUsed).length;
-      final usedCount = barcodes.where((b) => b.isUsed).length;
-      LoggerService.d('Loaded ${barcodes.length} barcodes', tag: _tag);
-      emit(TestQrLoaded(
-        barcodes: barcodes,
-        availableCount: availableCount,
-        usedCount: usedCount,
-      ));
+      final available = barcodes.where((b) => !b.isUsed).length;
+      final used = barcodes.where((b) => b.isUsed).length;
+      LoggerService.d('Barcodes loaded: ${barcodes.length} total, $available available, $used used', tag: _tag);
+      emit(TestQrLoaded(barcodes: barcodes, availableCount: available, usedCount: used));
     } catch (e) {
-      LoggerService.e('Failed to load barcodes', error: e, tag: _tag);
+      LoggerService.e('loadBarcodes failed', error: e, tag: _tag);
       emit(TestQrError(e.toString()));
     }
   }

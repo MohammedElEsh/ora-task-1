@@ -3,7 +3,6 @@ import '../../data/models/barcode_model.dart';
 
 sealed class ScannerState extends Equatable {
   const ScannerState();
-
   @override
   List<Object?> get props => [];
 }
@@ -36,7 +35,6 @@ class ScannerStatsLoaded extends ScannerState {
 class ScanAccepted extends ScannerState {
   final BarcodeModel barcode;
   const ScanAccepted(this.barcode);
-
   @override
   List<Object?> get props => [barcode];
 }
@@ -44,7 +42,6 @@ class ScanAccepted extends ScannerState {
 class ScanAlreadyUsed extends ScannerState {
   final BarcodeModel barcode;
   const ScanAlreadyUsed(this.barcode);
-
   @override
   List<Object?> get props => [barcode];
 }
@@ -52,7 +49,6 @@ class ScanAlreadyUsed extends ScannerState {
 class ScanNotFound extends ScannerState {
   final String code;
   const ScanNotFound(this.code);
-
   @override
   List<Object?> get props => [code];
 }
@@ -60,14 +56,12 @@ class ScanNotFound extends ScannerState {
 class ScanError extends ScannerState {
   final String message;
   const ScanError(this.message);
-
   @override
   List<Object?> get props => [message];
 }
 
 sealed class TestQrState extends Equatable {
   const TestQrState();
-
   @override
   List<Object?> get props => [];
 }
@@ -97,9 +91,7 @@ class TestQrLoaded extends TestQrState {
 
 class TestQrError extends TestQrState {
   final String message;
-
   const TestQrError(this.message);
-
   @override
   List<Object?> get props => [message];
 }

@@ -9,16 +9,19 @@ import '../services/logger/logger_service.dart';
 final sl = GetIt.instance;
 
 void initDependencies() {
-  LoggerService.d('Registering dependencies');
+  LoggerService.d('Registering BarcodeDatabase');
   sl.registerSingleton<BarcodeDatabase>(BarcodeDatabase());
-  LoggerService.d('Registered BarcodeDatabase');
+
+  LoggerService.d('Registering BarcodeRepository');
   sl.registerSingleton<BarcodeRepository>(
     BarcodeRepositoryImpl(sl<BarcodeDatabase>()),
   );
-  LoggerService.d('Registered BarcodeRepository');
+
+  LoggerService.d('Registering ScannerCubit');
   sl.registerFactory<ScannerCubit>(() => ScannerCubit(sl<BarcodeRepository>()));
-  LoggerService.d('Registered ScannerCubit');
+
+  LoggerService.d('Registering TestQrCubit');
   sl.registerFactory<TestQrCubit>(() => TestQrCubit(sl<BarcodeRepository>()));
-  LoggerService.d('Registered TestQrCubit');
+
   LoggerService.i('All dependencies registered');
 }

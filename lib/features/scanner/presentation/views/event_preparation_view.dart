@@ -21,47 +21,48 @@ class EventPreparationView extends StatefulWidget {
 }
 
 class _EventPreparationViewState extends State<EventPreparationView> {
-  static const _tag = 'EventPreparationView';
+  static const _tag = 'PrepView';
   late final ScannerCubit _cubit;
 
   @override
   void initState() {
     super.initState();
-    LoggerService.i('EventPreparationView initialized', tag: _tag);
+    LoggerService.i('Initialized', tag: _tag);
     _cubit = sl<ScannerCubit>()..loadStats();
   }
 
   @override
   void dispose() {
-    LoggerService.d('EventPreparationView disposed', tag: _tag);
+    LoggerService.d('Disposed', tag: _tag);
     _cubit.close();
     super.dispose();
   }
 
-  void _navigateToScanner(BuildContext context) {
-    LoggerService.i('Navigating to scanner', tag: _tag);
+  void _openScanner() {
+    LoggerService.i('Navigating to ScannerView', tag: _tag);
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => BlocProvider(
-          create: (context) => sl<ScannerCubit>(),
+        builder: (_) => BlocProvider(
+          create: (_) => sl<ScannerCubit>(),
           child: const ScannerView(),
         ),
       ),
     ).then((_) {
+      LoggerService.d('Returned from ScannerView, reloading stats', tag: _tag);
       if (mounted) _cubit.loadStats();
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    LoggerService.d('Building UI', tag: _tag);
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(18.0),
+          padding: EdgeInsets.all(18.r),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(height: 24.h),
               const PrepHeader(),
@@ -77,20 +78,18 @@ class _EventPreparationViewState extends State<EventPreparationView> {
               BlocBuilder<ScannerCubit, ScannerState>(
                 bloc: _cubit,
                 builder: (context, state) {
-                  final total = state is ScannerStatsLoaded ? state.total : 0;
-                  final used = state is ScannerStatsLoaded ? state.used : 0;
-                  final available = state is ScannerStatsLoaded
-                      ? state.available
-                      : 0;
+                  final s = state is ScannerStatsLoaded ? state : null;
+                  LoggerService.d('Stats state: total=${s?.total}, used=${s?.used}, available=${s?.available}', tag: _tag);
                   return PrepStatsSection(
-                    totalTickets: total,
-                    usedTickets: used,
-                    availableTickets: available,
+                    totalTickets: s?.total ?? 0,
+                    usedTickets: s?.used ?? 0,
+                    availableTickets: s?.available ?? 0,
                   );
                 },
               ),
-              SizedBox(height: 64.h),
-              ScanQrButton(onTap: () => _navigateToScanner(context)),
+              const Spacer(),
+              ScanQrButton(onTap: _openScanner),
+              SizedBox(height: 24.h),
             ],
           ),
         ),

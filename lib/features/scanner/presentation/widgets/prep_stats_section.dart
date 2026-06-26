@@ -22,10 +22,7 @@ class PrepStatsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Ticket Statistics',
-          style: AppTypography.semiBold16.copyWith(color: AppColors.grey900),
-        ),
+        Text('Ticket Statistics', style: AppTypography.semiBold16),
         SizedBox(height: 12.h),
         Row(
           children: [

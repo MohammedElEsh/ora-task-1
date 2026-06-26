@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/di/injection.dart';
+import '../../../../core/services/logger/logger_service.dart';
 import '../manager/scanner_cubit.dart';
 import '../manager/scanner_state.dart';
 import '../widgets/bottom_sheet_handle.dart';
@@ -15,28 +16,28 @@ class TestQrView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    LoggerService.d('TestQrView.build()', tag: 'TestQrView');
     return BlocProvider(
-      create: (context) => sl<TestQrCubit>()..loadBarcodes(),
-      child: const _TestQrContent(),
+      create: (_) {
+        LoggerService.i('Creating TestQrCubit', tag: 'TestQrView');
+        return sl<TestQrCubit>()..loadBarcodes();
+      },
+      child: const _SheetContent(),
     );
   }
 }
 
-class _TestQrContent extends StatelessWidget {
-  const _TestQrContent();
+class _SheetContent extends StatelessWidget {
+  const _SheetContent();
 
   @override
   Widget build(BuildContext context) {
+    LoggerService.d('_SheetContent.build()', tag: 'TestQrView');
     return Container(
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.75,
-      ),
+      constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.75),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(24.r),
-          topRight: Radius.circular(24.r),
-        ),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -46,9 +47,9 @@ class _TestQrContent extends StatelessWidget {
           SizedBox(height: 8.h),
           BlocBuilder<TestQrCubit, TestQrState>(
             builder: (context, state) {
-              final available = state is TestQrLoaded ? state.availableCount : 0;
-              final used = state is TestQrLoaded ? state.usedCount : 0;
-              return TestQrStats(available: available, used: used);
+              final s = state is TestQrLoaded ? state : null;
+              LoggerService.d('Stats: available=${s?.availableCount}, used=${s?.usedCount}', tag: 'TestQrView');
+              return TestQrStats(available: s?.availableCount ?? 0, used: s?.usedCount ?? 0);
             },
           ),
           SizedBox(height: 8.h),
@@ -56,18 +57,21 @@ class _TestQrContent extends StatelessWidget {
             child: BlocBuilder<TestQrCubit, TestQrState>(
               builder: (context, state) {
                 if (state is TestQrLoading) {
-                  return SizedBox(
-                    height: 200.h,
-                    child: const Center(child: CircularProgressIndicator()),
-                  );
+                  LoggerService.d('Loading barcodes...', tag: 'TestQrView');
+                  return SizedBox(height: 200.h, child: const Center(child: CircularProgressIndicator()));
                 }
                 if (state is TestQrLoaded) {
+                  LoggerService.d('Loaded ${state.barcodes.length} barcodes', tag: 'TestQrView');
                   return RefreshIndicator(
-                    onRefresh: () => context.read<TestQrCubit>().loadBarcodes(),
+                    onRefresh: () {
+                      LoggerService.d('Refresh triggered', tag: 'TestQrView');
+                      return context.read<TestQrCubit>().loadBarcodes();
+                    },
                     child: TestQrTicketList(barcodes: state.barcodes),
                   );
                 }
                 if (state is TestQrError) {
+                  LoggerService.e('Error: ${state.message}', tag: 'TestQrView');
                   return SizedBox(
                     height: 200.h,
                     child: Center(
@@ -79,7 +83,10 @@ class _TestQrContent extends StatelessWidget {
                           Text(state.message),
                           SizedBox(height: 16.h),
                           ElevatedButton(
-                            onPressed: () => context.read<TestQrCubit>().loadBarcodes(),
+                            onPressed: () {
+                              LoggerService.d('Retry tapped', tag: 'TestQrView');
+                              context.read<TestQrCubit>().loadBarcodes();
+                            },
                             child: const Text('Retry'),
                           ),
                         ],

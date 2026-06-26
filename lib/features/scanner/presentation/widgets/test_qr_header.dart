@@ -15,15 +15,9 @@ class TestQrHeader extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Test Scanner',
-            style: AppTypography.semiBold18.copyWith(color: AppColors.grey900),
-          ),
+          Text('Test Scanner', style: AppTypography.semiBold18),
           SizedBox(height: 6.h),
-          Text(
-            'Select a ticket to simulate scanning',
-            style: AppTypography.regular14.copyWith(color: AppColors.grey500),
-          ),
+          Text('Select a ticket to simulate scanning', style: AppTypography.regular14.copyWith(color: AppColors.grey500)),
         ],
       ),
     );

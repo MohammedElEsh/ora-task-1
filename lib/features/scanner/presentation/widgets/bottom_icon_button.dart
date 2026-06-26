@@ -20,36 +20,22 @@ class BottomIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final active = isActive;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
         decoration: BoxDecoration(
-          color: isActive
-              ? AppColors.primary.withValues(alpha: 0.1)
-              : AppColors.grey50,
+          color: active ? AppColors.primary.withValues(alpha: 0.1) : AppColors.grey50,
           borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(
-            color: isActive
-                ? AppColors.primary.withValues(alpha: 0.3)
-                : AppColors.grey100,
-          ),
+          border: Border.all(color: active ? AppColors.primary.withValues(alpha: 0.3) : AppColors.grey100),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              color: isActive ? AppColors.primary : AppColors.grey600,
-              size: 22.r,
-            ),
+            Icon(icon, color: active ? AppColors.primary : AppColors.grey600, size: 22.r),
             SizedBox(height: 4.h),
-            Text(
-              label,
-              style: AppTypography.medium11.copyWith(
-                color: isActive ? AppColors.primary : AppColors.grey600,
-              ),
-            ),
+            Text(label, style: AppTypography.medium11.copyWith(color: active ? AppColors.primary : AppColors.grey600)),
           ],
         ),
       ),
