@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 
 import 'app.dart';
 import 'core/di/injection.dart';
-import 'core/services/storage/hive_storage_service.dart';
+import 'core/services/logger/logger_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await HiveStorageServiceImpl.init('tasks');
+  LoggerService.i('App starting');
   initDependencies();
+  LoggerService.i('Dependencies initialized');
 
   runApp(const App());
 }

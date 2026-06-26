@@ -17,20 +17,11 @@ abstract class AppTypography {
     );
   }
 
-  static TextStyle get bold36 =>
-      _base(fontSize: 36, fontWeight: FontWeight.w700, letterSpacing: -0.5);
-
   static TextStyle get bold32 =>
       _base(fontSize: 32, fontWeight: FontWeight.w700, letterSpacing: -0.5);
 
   static TextStyle get bold28 =>
       _base(fontSize: 28, fontWeight: FontWeight.w700, letterSpacing: -0.3);
-
-  static TextStyle get extraBold24 =>
-      _base(fontSize: 24, fontWeight: FontWeight.w800, letterSpacing: -0.3);
-
-  static TextStyle get semiBold22 =>
-      _base(fontSize: 22, fontWeight: FontWeight.w600, letterSpacing: -0.2);
 
   static TextStyle get semiBold20 =>
       _base(fontSize: 20, fontWeight: FontWeight.w600, letterSpacing: -0.2);
@@ -44,9 +35,6 @@ abstract class AppTypography {
   static TextStyle get semiBold14 =>
       _base(fontSize: 14, fontWeight: FontWeight.w600);
 
-  static TextStyle get medium15 =>
-      _base(fontSize: 15, fontWeight: FontWeight.w500);
-
   static TextStyle get medium14 =>
       _base(fontSize: 14, fontWeight: FontWeight.w500);
 
@@ -58,9 +46,6 @@ abstract class AppTypography {
 
   static TextStyle get medium10 =>
       _base(fontSize: 10, fontWeight: FontWeight.w500);
-
-  static TextStyle get regular16 =>
-      _base(fontSize: 16, fontWeight: FontWeight.w400);
 
   static TextStyle get regular14 =>
       _base(fontSize: 14, fontWeight: FontWeight.w400);

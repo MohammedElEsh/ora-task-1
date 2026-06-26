@@ -1,9 +1,11 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../../../../core/services/logger/logger_service.dart';
 import '../models/barcode_model.dart';
 
 class BarcodeDatabase {
+  static const _tag = 'BarcodeDatabase';
   Database? _database;
 
   Future<Database> get database async {
@@ -12,6 +14,7 @@ class BarcodeDatabase {
   }
 
   Future<Database> _initDatabase() async {
+    LoggerService.d('Initializing database', tag: _tag);
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, 'barcodes.db');
 
@@ -19,6 +22,7 @@ class BarcodeDatabase {
       path,
       version: 4,
       onCreate: (db, version) async {
+        LoggerService.i('Creating barcodes table (version $version)', tag: _tag);
         await db.execute('''
           CREATE TABLE barcodes(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -34,6 +38,7 @@ class BarcodeDatabase {
         await _seedDemoData(db);
       },
       onUpgrade: (db, oldVersion, newVersion) async {
+        LoggerService.w('Upgrading database from v$oldVersion to v$newVersion', tag: _tag);
         await db.execute('DROP TABLE IF EXISTS barcodes');
         await db.execute('''
           CREATE TABLE barcodes(
@@ -52,25 +57,8 @@ class BarcodeDatabase {
     );
   }
 
-  Future<void> resetAndSeed() async {
-    final db = await database;
-    await db.execute('DROP TABLE IF EXISTS barcodes');
-    await db.execute('''
-      CREATE TABLE barcodes(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        code TEXT NOT NULL UNIQUE,
-        event_name TEXT NOT NULL,
-        holder_name TEXT NOT NULL DEFAULT '',
-        ticket_type TEXT NOT NULL DEFAULT '',
-        is_used INTEGER NOT NULL DEFAULT 0,
-        used_at INTEGER,
-        created_at INTEGER NOT NULL
-      )
-    ''');
-    await _seedDemoData(db);
-  }
-
   Future<void> _seedDemoData(Database db) async {
+    LoggerService.d('Seeding demo data', tag: _tag);
     final now = DateTime.now().millisecondsSinceEpoch;
 
     await db.insert('barcodes', {
@@ -192,40 +180,24 @@ class BarcodeDatabase {
     });
   }
 
-  Future<void> insertBarcode(BarcodeModel barcode) async {
-    final db = await database;
-    await db.insert(
-      'barcodes',
-      barcode.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-  }
-
-  Future<void> insertBarcodes(List<BarcodeModel> barcodes) async {
-    final db = await database;
-    final batch = db.batch();
-    for (final barcode in barcodes) {
-      batch.insert(
-        'barcodes',
-        barcode.toMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-    }
-    await batch.commit();
-  }
-
   Future<BarcodeModel?> findByCode(String code) async {
+    LoggerService.d('Finding barcode by code: $code', tag: _tag);
     final db = await database;
     final maps = await db.query(
       'barcodes',
       where: 'code = ?',
       whereArgs: [code],
     );
-    if (maps.isEmpty) return null;
+    if (maps.isEmpty) {
+      LoggerService.d('Barcode not found: $code', tag: _tag);
+      return null;
+    }
+    LoggerService.d('Barcode found: $code', tag: _tag);
     return BarcodeModel.fromMap(maps.first);
   }
 
   Future<void> markAsUsed(int id) async {
+    LoggerService.i('Marking barcode as used: id=$id', tag: _tag);
     final db = await database;
     await db.update(
       'barcodes',
@@ -236,22 +208,10 @@ class BarcodeDatabase {
   }
 
   Future<List<BarcodeModel>> getAllBarcodes() async {
+    LoggerService.d('Getting all barcodes', tag: _tag);
     final db = await database;
     final maps = await db.query('barcodes', orderBy: 'created_at DESC');
+    LoggerService.d('Found ${maps.length} barcodes', tag: _tag);
     return maps.map((map) => BarcodeModel.fromMap(map)).toList();
-  }
-
-  Future<void> deleteBarcode(int id) async {
-    final db = await database;
-    await db.delete('barcodes', where: 'id = ?', whereArgs: [id]);
-  }
-
-  Future<void> clearAll() async {
-    final db = await database;
-    await db.delete('barcodes');
-  }
-
-  Future<void> seedDemoData() async {
-    await resetAndSeed();
   }
 }

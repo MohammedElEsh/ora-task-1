@@ -1,16 +1,18 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../../core/di/injection.dart';
+import '../../../../core/services/logger/logger_service.dart';
 import '../../../../core/theme/colors/app_colors.dart';
-import '../../../../core/theme/typography/app_typography.dart';
 import '../../data/repositories/barcode_repository.dart';
 import '../manager/scanner_cubit.dart';
 import '../manager/scanner_state.dart';
+import '../widgets/scan_instruction.dart';
 import '../widgets/scan_overlay.dart';
 import '../widgets/scan_result_overlay.dart';
 import '../widgets/scanner_bottom_bar.dart';
@@ -25,6 +27,7 @@ class ScannerView extends StatefulWidget {
 }
 
 class _ScannerViewState extends State<ScannerView> {
+  static const _tag = 'ScannerView';
   late MobileScannerController _controller;
   bool _isScannerActive = true;
   int _scannedToday = 0;
@@ -38,6 +41,7 @@ class _ScannerViewState extends State<ScannerView> {
   @override
   void initState() {
     super.initState();
+    LoggerService.i('ScannerView initialized', tag: _tag);
     _controller = MobileScannerController(
       detectionSpeed: DetectionSpeed.normal,
       facing: CameraFacing.back,
@@ -50,6 +54,7 @@ class _ScannerViewState extends State<ScannerView> {
 
   @override
   void dispose() {
+    LoggerService.d('ScannerView disposed', tag: _tag);
     _resultTimer?.cancel();
     _cooldownTimer?.cancel();
     _controller.dispose();
@@ -57,6 +62,7 @@ class _ScannerViewState extends State<ScannerView> {
   }
 
   Future<void> _loadStats() async {
+    LoggerService.d('Loading scan stats', tag: _tag);
     try {
       final barcodes = await sl<BarcodeRepository>().getAllBarcodes();
       final today = DateTime.now();
@@ -73,19 +79,24 @@ class _ScannerViewState extends State<ScannerView> {
           _scannedToday = todayScanned;
           _totalScanned = barcodes.where((b) => b.isUsed).length;
         });
+        LoggerService.d('Stats loaded: today=$_scannedToday, total=$_totalScanned', tag: _tag);
       }
-    } catch (_) {}
+    } catch (e) {
+      LoggerService.e('Failed to load stats', error: e, tag: _tag);
+    }
   }
 
   void _onBarcodeDetected(BarcodeCapture capture) {
     if (_isProcessing) return;
     final barcode = capture.barcodes.firstOrNull;
     if (barcode == null || barcode.rawValue == null) return;
+    LoggerService.d('Barcode detected: ${barcode.rawValue}', tag: _tag);
     _processBarcode(barcode.rawValue!);
   }
 
   void _processBarcode(String code) {
     if (_isProcessing) return;
+    LoggerService.i('Processing barcode: $code', tag: _tag);
     setState(() => _isProcessing = true);
     context.read<ScannerCubit>().onBarcodeScanned(code);
   }
@@ -99,6 +110,7 @@ class _ScannerViewState extends State<ScannerView> {
   }
 
   void _resetScan() {
+    LoggerService.d('Resetting scanner', tag: _tag);
     context.read<ScannerCubit>().resetScanner();
     setState(() {
       _isProcessing = false;
@@ -111,6 +123,7 @@ class _ScannerViewState extends State<ScannerView> {
       backgroundColor: Colors.black,
       body: BlocListener<ScannerCubit, ScannerState>(
         listener: (context, state) {
+          LoggerService.d('State changed: ${state.runtimeType}', tag: _tag);
           if (state is ScannerInitial) {
             setState(() {
               _frameBorderColor = Colors.white;
@@ -175,16 +188,14 @@ class _ScannerViewState extends State<ScannerView> {
                 ),
                 if (_isScannerActive)
                   Positioned.fill(
-                    child: ScanOverlay(
-                      borderColor: _frameBorderColor,
-                    ),
+                    child: ScanOverlay(borderColor: _frameBorderColor),
                   ),
                 Positioned(
                   top: MediaQuery.of(context).padding.top + 8.h,
                   left: 0,
                   right: 0,
                   child: ScannerTopBar(
-                    eventName: 'Music Festival 2025',
+                    eventName: 'Music Festival 2026',
                     location: 'Main Gate',
                     pendingSyncCount: 0,
                     onBack: () => Navigator.pop(context),
@@ -194,7 +205,9 @@ class _ScannerViewState extends State<ScannerView> {
                   top: MediaQuery.of(context).padding.top + 70.h,
                   left: 0,
                   right: 0,
-                  child: _buildScanInstruction(state),
+                  child: (state is ScannerInitial || state is ScannerLoading)
+                      ? const ScanInstruction()
+                      : const SizedBox.shrink(),
                 ),
                 AnimatedPositioned(
                   duration: const Duration(milliseconds: 350),
@@ -204,10 +217,7 @@ class _ScannerViewState extends State<ScannerView> {
                   bottom: (state is ScannerInitial || state is ScannerLoading)
                       ? -180.h
                       : MediaQuery.of(context).padding.bottom + 100.h,
-                  child: ScanResultOverlay(
-                    state: state,
-                    onDismiss: _resetScan,
-                  ),
+                  child: ScanResultOverlay(state: state, onDismiss: _resetScan),
                 ),
                 Positioned(
                   bottom: 0,
@@ -238,41 +248,6 @@ class _ScannerViewState extends State<ScannerView> {
             );
           },
         ),
-      ),
-    );
-  }
-
-  Widget _buildScanInstruction(ScannerState state) {
-    if (state is! ScannerInitial && state is! ScannerLoading) {
-      return const SizedBox.shrink();
-    }
-
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 40.w),
-      child: Column(
-        children: [
-          Icon(
-            Icons.center_focus_strong_rounded,
-            color: Colors.white.withValues(alpha: 0.8),
-            size: 32.r,
-          ),
-          SizedBox(height: 8.h),
-          Text(
-            'Align QR code within the frame',
-            style: AppTypography.medium14.copyWith(
-              color: Colors.white.withValues(alpha: 0.9),
-            ),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 4.h),
-          Text(
-            'Hold steady for automatic detection',
-            style: AppTypography.regular12.copyWith(
-              color: Colors.white60,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
       ),
     );
   }
