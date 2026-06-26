@@ -1,14 +1,14 @@
 import 'package:equatable/equatable.dart';
 
 class BarcodeModel extends Equatable {
-  final int? id;
-  final String code;
-  final String eventName;
-  final String holderName;
-  final String ticketType;
-  final bool isUsed;
-  final DateTime? usedAt;
-  final DateTime createdAt;
+  final int? id; // SQLite row ID (null before insert)
+  final String code; // barcode string, e.g. "TKT-001"
+  final String eventName; // which event this ticket is for
+  final String holderName; // attendee name
+  final String ticketType; // VIP / Standard / Speaker Pass / etc.
+  final bool isUsed; // true = already scanned at the gate
+  final DateTime? usedAt; // when it was scanned (null if unused)
+  final DateTime createdAt; // when the record was created
 
   const BarcodeModel({
     this.id,
@@ -21,6 +21,8 @@ class BarcodeModel extends Equatable {
     required this.createdAt,
   });
 
+  /// Returns a copy with only `isUsed` and `usedAt` overridden.
+  /// Used after scanning to mark a ticket as used without touching other fields.
   BarcodeModel copyWith({bool? isUsed, DateTime? usedAt}) => BarcodeModel(
     id: id,
     code: code,
@@ -32,17 +34,6 @@ class BarcodeModel extends Equatable {
     createdAt: createdAt,
   );
 
-  Map<String, dynamic> toMap() => {
-    'id': id,
-    'code': code,
-    'event_name': eventName,
-    'holder_name': holderName,
-    'ticket_type': ticketType,
-    'is_used': isUsed ? 1 : 0,
-    'used_at': usedAt?.millisecondsSinceEpoch,
-    'created_at': createdAt.millisecondsSinceEpoch,
-  };
-
   factory BarcodeModel.fromMap(Map<String, dynamic> m) => BarcodeModel(
     id: m['id'] as int?,
     code: m['code'] as String,
@@ -50,10 +41,21 @@ class BarcodeModel extends Equatable {
     holderName: (m['holder_name'] as String?) ?? '',
     ticketType: (m['ticket_type'] as String?) ?? '',
     isUsed: (m['is_used'] as int) == 1,
-    usedAt: m['used_at'] != null ? DateTime.fromMillisecondsSinceEpoch(m['used_at'] as int) : null,
+    usedAt: m['used_at'] != null
+        ? DateTime.fromMillisecondsSinceEpoch(m['used_at'] as int)
+        : null,
     createdAt: DateTime.fromMillisecondsSinceEpoch(m['created_at'] as int),
   );
 
   @override
-  List<Object?> get props => [id, code, eventName, holderName, ticketType, isUsed, usedAt, createdAt];
+  List<Object?> get props => [
+    id,
+    code,
+    eventName,
+    holderName,
+    ticketType,
+    isUsed,
+    usedAt,
+    createdAt,
+  ];
 }

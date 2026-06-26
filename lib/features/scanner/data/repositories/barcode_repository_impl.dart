@@ -6,13 +6,19 @@ import 'barcode_repository.dart';
 class BarcodeRepositoryImpl implements BarcodeRepository {
   static const _tag = 'BarcodeRepository';
   final BarcodeDatabase _database;
+
   BarcodeRepositoryImpl(this._database);
 
   @override
   Future<BarcodeModel?> findByCode(String code) async {
     LoggerService.d('findByCode: $code', tag: _tag);
     final result = await _database.findByCode(code);
-    LoggerService.d(result != null ? 'Found: ${result.code} (id=${result.id})' : 'Not found: $code', tag: _tag);
+    LoggerService.d(
+      result != null
+          ? 'Found: ${result.code} (id=${result.id})'
+          : 'Not found: $code',
+      tag: _tag,
+    );
     return result;
   }
 
@@ -35,7 +41,10 @@ class BarcodeRepositoryImpl implements BarcodeRepository {
   Future<Map<String, int>> getBarcodeStats() async {
     LoggerService.d('getBarcodeStats', tag: _tag);
     final stats = await _database.getBarcodeStats();
-    LoggerService.d('Stats: total=${stats['total']}, used=${stats['used']}, available=${stats['available']}, today=${stats['todayScanned']}', tag: _tag);
+    LoggerService.d(
+      'Stats: total=${stats['total']}, used=${stats['used']}, available=${stats['available']}, today=${stats['todayScanned']}',
+      tag: _tag,
+    );
     return stats;
   }
 }

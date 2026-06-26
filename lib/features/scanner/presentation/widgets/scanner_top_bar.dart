@@ -1,3 +1,8 @@
+/// Top bar overlay on the scanner screen.
+///
+/// Shows a back button, event badge (name + location with green dot),
+/// and an optional pending-sync counter. Rendered as a floating overlay
+/// on top of the camera feed.
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -26,9 +31,12 @@ class ScannerTopBar extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       child: Row(
         children: [
+          // Back button (arrow in dark container)
           _BackButton(onTap: onBack),
           SizedBox(width: 12.w),
+          // Event name + location badge (dark semi-transparent background)
           Expanded(child: _EventBadge(eventName: eventName, location: location)),
+          // Pending sync counter (only shown if > 0)
           if (pendingSyncCount > 0) ...[
             SizedBox(width: 10.w),
             Container(
@@ -43,6 +51,7 @@ class ScannerTopBar extends StatelessWidget {
   }
 }
 
+/// Semi-transparent dark back button.
 class _BackButton extends StatelessWidget {
   final VoidCallback onTap;
   const _BackButton({required this.onTap});
@@ -67,6 +76,7 @@ class _BackButton extends StatelessWidget {
   }
 }
 
+/// Event badge: green dot + event name + location pin.
 class _EventBadge extends StatelessWidget {
   final String eventName;
   final String location;
@@ -82,6 +92,7 @@ class _EventBadge extends StatelessWidget {
       ),
       child: Row(
         children: [
+          // Green "online" indicator dot
           Container(width: 8.r, height: 8.r, decoration: const BoxDecoration(color: AppColors.badgeOnline, shape: BoxShape.circle)),
           SizedBox(width: 10.w),
           Expanded(
@@ -89,8 +100,10 @@ class _EventBadge extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Event name (white text, single line)
                 Text(eventName, style: AppTypography.semiBold14.copyWith(color: Colors.white), maxLines: 1, overflow: TextOverflow.ellipsis),
                 SizedBox(height: 2.h),
+                // Location with pin icon
                 Row(
                   children: [
                     Icon(Icons.location_on_outlined, color: Colors.white70, size: 10.r),

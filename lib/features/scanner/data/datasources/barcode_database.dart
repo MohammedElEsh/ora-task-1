@@ -3,6 +3,7 @@ import 'package:sqflite/sqflite.dart';
 
 import '../models/barcode_model.dart';
 
+/// Local SQLite database for barcode storage.
 class BarcodeDatabase {
   Database? _db;
 
@@ -12,23 +13,23 @@ class BarcodeDatabase {
     final path = join(await getDatabasesPath(), 'barcodes.db');
     return openDatabase(
       path,
-      version: 4,
-      onCreate: _create,
-      onUpgrade: _upgrade,
+      version: 4, // bumped when schema changes
+      onCreate: _create, // runs once when DB is first created
+      onUpgrade: _upgrade, // runs when version number increases
     );
   }
 
   Future<void> _create(Database db, int version) async {
     await db.execute('''
       CREATE TABLE barcodes(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        code TEXT NOT NULL UNIQUE,
-        event_name TEXT NOT NULL,
-        holder_name TEXT NOT NULL DEFAULT '',
-        ticket_type TEXT NOT NULL DEFAULT '',
-        is_used INTEGER NOT NULL DEFAULT 0,
-        used_at INTEGER,
-        created_at INTEGER NOT NULL
+        id INTEGER PRIMARY KEY AUTOINCREMENT,  -- auto-generated row ID
+        code TEXT NOT NULL UNIQUE,              -- barcode string (e.g. "TKT-001"), must be unique
+        event_name TEXT NOT NULL,               -- event this ticket belongs to
+        holder_name TEXT NOT NULL DEFAULT '',   -- ticket holder's name
+        ticket_type TEXT NOT NULL DEFAULT '',   -- VIP / Standard / etc.
+        is_used INTEGER NOT NULL DEFAULT 0,     -- 0 = unused, 1 = already scanned
+        used_at INTEGER,                        -- timestamp (ms) when scanned, null if unused
+        created_at INTEGER NOT NULL             -- timestamp (ms) when inserted
       )
     ''');
     await _seed(db);
@@ -41,6 +42,7 @@ class BarcodeDatabase {
 
   Future<void> _seed(Database db) async {
     final now = DateTime.now().millisecondsSinceEpoch;
+
     final data = [
       ('TKT-001', 'Music Festival 2025', 'Alice Johnson', 'VIP Pass', false),
       ('TKT-002', 'Music Festival 2025', 'Alice Johnson', 'VIP Pass', false),
@@ -48,13 +50,6 @@ class BarcodeDatabase {
       ('TKT-006', 'Tech Conference', 'Frank Wilson', 'Standard', true),
       ('TKT-007', 'Tech Conference', 'Grace Kim', 'Workshop Pass', false),
       ('TKT-008', 'Art Exhibition', 'Henry Brown', 'Premium Ticket', false),
-      (
-        'TKT-009',
-        'Music Festival 2025',
-        'Ivy Chen',
-        'General Admission',
-        false,
-      ),
       ('TKT-012', 'Tech Conference', 'Leo Martinez', 'Speaker Pass', false),
       ('TKT-013', 'Tech Conference', 'Leo Martinez', 'Speaker Pass', false),
       ('TKT-014', 'Tech Conference', 'Leo Martinez', 'Speaker Pass', false),
@@ -78,11 +73,13 @@ class BarcodeDatabase {
 
   Future<BarcodeModel?> findByCode(String code) async {
     final db = await database;
+
     final maps = await db.query(
       'barcodes',
       where: 'code = ?',
       whereArgs: [code],
     );
+
     return maps.isEmpty ? null : BarcodeModel.fromMap(maps.first);
   }
 
@@ -90,7 +87,10 @@ class BarcodeDatabase {
     final db = await database;
     await db.update(
       'barcodes',
-      {'is_used': 1, 'used_at': DateTime.now().millisecondsSinceEpoch},
+      {
+        'is_used': 1, // mark as scanned
+        'used_at': DateTime.now().millisecondsSinceEpoch,
+      },
       where: 'id = ?',
       whereArgs: [id],
     );
@@ -99,14 +99,18 @@ class BarcodeDatabase {
   Future<List<BarcodeModel>> getAllBarcodes() async {
     final db = await database;
     final maps = await db.query('barcodes', orderBy: 'created_at DESC');
+    // Convert each row map to a BarcodeModel
     return maps.map(BarcodeModel.fromMap).toList();
   }
 
   Future<Map<String, int>> getBarcodeStats() async {
     final db = await database;
+
     final all = await db.query('barcodes');
     final total = all.length;
+
     final used = all.where((m) => (m['is_used'] as int) == 1).length;
+
     final now = DateTime.now();
     final todayScanned = all.where((m) {
       if ((m['is_used'] as int) != 1 || m['used_at'] == null) return false;
