@@ -6,4 +6,6 @@ abstract class BarcodeRepository {
   Future<void> markAsUsed(int id);
 
   Future<List<BarcodeModel>> getAllBarcodes();
+
+  Future<Map<String, int>> getBarcodeStats();
 }

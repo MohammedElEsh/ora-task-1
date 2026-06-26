@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/theme/colors/app_colors.dart';
 import '../../../../core/theme/typography/app_typography.dart';
+import 'bottom_icon_button.dart';
 
 class ScannerBottomBar extends StatelessWidget {
   final bool isTorchOn;
@@ -46,7 +47,7 @@ class ScannerBottomBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _BottomIconButton(
+          BottomIconButton(
             icon: isTorchOn
                 ? Icons.flashlight_on_rounded
                 : Icons.flashlight_off_rounded,
@@ -77,64 +78,12 @@ class ScannerBottomBar extends StatelessWidget {
               ),
             ],
           ),
-          _BottomIconButton(
+          BottomIconButton(
             icon: Icons.grid_view_rounded,
             label: 'Test',
             onTap: onTestTap,
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _BottomIconButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool isActive;
-  final VoidCallback onTap;
-
-  const _BottomIconButton({
-    required this.icon,
-    required this.label,
-    this.isActive = false,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
-        decoration: BoxDecoration(
-          color: isActive
-              ? AppColors.primary.withValues(alpha: 0.1)
-              : AppColors.grey50,
-          borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(
-            color: isActive
-                ? AppColors.primary.withValues(alpha: 0.3)
-                : AppColors.grey100,
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: isActive ? AppColors.primary : AppColors.grey600,
-              size: 22.r,
-            ),
-            SizedBox(height: 4.h),
-            Text(
-              label,
-              style: AppTypography.medium11.copyWith(
-                color: isActive ? AppColors.primary : AppColors.grey600,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

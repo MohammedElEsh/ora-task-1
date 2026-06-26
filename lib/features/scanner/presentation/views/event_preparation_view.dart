@@ -5,12 +5,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/di/injection.dart';
 import '../../../../core/services/logger/logger_service.dart';
 import '../../../../core/theme/colors/app_colors.dart';
-import '../../data/repositories/barcode_repository.dart';
 import '../manager/scanner_cubit.dart';
+import '../manager/scanner_state.dart';
 import '../widgets/event_info_card.dart';
-import '../widgets/prep_bottom_button.dart';
 import '../widgets/prep_header.dart';
 import '../widgets/prep_stats_section.dart';
+import '../widgets/scan_qr_button.dart';
 import 'scanner_view.dart';
 
 class EventPreparationView extends StatefulWidget {
@@ -20,54 +20,22 @@ class EventPreparationView extends StatefulWidget {
   State<EventPreparationView> createState() => _EventPreparationViewState();
 }
 
-class _EventPreparationViewState extends State<EventPreparationView>
-    with WidgetsBindingObserver {
+class _EventPreparationViewState extends State<EventPreparationView> {
   static const _tag = 'EventPreparationView';
-  int _totalTickets = 0;
-  int _usedTickets = 0;
-  int _availableTickets = 0;
+  late final ScannerCubit _cubit;
 
   @override
   void initState() {
     super.initState();
     LoggerService.i('EventPreparationView initialized', tag: _tag);
-    WidgetsBinding.instance.addObserver(this);
-    _loadStats();
+    _cubit = sl<ScannerCubit>()..loadStats();
   }
 
   @override
   void dispose() {
     LoggerService.d('EventPreparationView disposed', tag: _tag);
-    WidgetsBinding.instance.removeObserver(this);
+    _cubit.close();
     super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      LoggerService.d('App resumed, reloading stats', tag: _tag);
-      _loadStats();
-    }
-  }
-
-  Future<void> _loadStats() async {
-    LoggerService.d('Loading ticket stats', tag: _tag);
-    try {
-      final barcodes = await sl<BarcodeRepository>().getAllBarcodes();
-      if (mounted) {
-        setState(() {
-          _totalTickets = barcodes.length;
-          _usedTickets = barcodes.where((b) => b.isUsed).length;
-          _availableTickets = _totalTickets - _usedTickets;
-        });
-        LoggerService.d(
-          'Stats loaded: total=$_totalTickets, used=$_usedTickets, available=$_availableTickets',
-          tag: _tag,
-        );
-      }
-    } catch (e) {
-      LoggerService.e('Failed to load stats', error: e, tag: _tag);
-    }
   }
 
   void _navigateToScanner(BuildContext context) {
@@ -80,7 +48,9 @@ class _EventPreparationViewState extends State<EventPreparationView>
           child: const ScannerView(),
         ),
       ),
-    ).then((_) => _loadStats());
+    ).then((_) {
+      if (mounted) _cubit.loadStats();
+    });
   }
 
   @override
@@ -88,11 +58,10 @@ class _EventPreparationViewState extends State<EventPreparationView>
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: EdgeInsets.symmetric(horizontal: 20.w),
+        child: Padding(
+          padding: const EdgeInsets.all(18.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(height: 24.h),
               const PrepHeader(),
@@ -104,19 +73,27 @@ class _EventPreparationViewState extends State<EventPreparationView>
                 time: '8:00 PM',
                 gateNumber: 'Gate 3',
               ),
-              SizedBox(height: 20.h),
-              PrepStatsSection(
-                totalTickets: _totalTickets,
-                usedTickets: _usedTickets,
-                availableTickets: _availableTickets,
+              SizedBox(height: 50.h),
+              BlocBuilder<ScannerCubit, ScannerState>(
+                bloc: _cubit,
+                builder: (context, state) {
+                  final total = state is ScannerStatsLoaded ? state.total : 0;
+                  final used = state is ScannerStatsLoaded ? state.used : 0;
+                  final available = state is ScannerStatsLoaded
+                      ? state.available
+                      : 0;
+                  return PrepStatsSection(
+                    totalTickets: total,
+                    usedTickets: used,
+                    availableTickets: available,
+                  );
+                },
               ),
-              SizedBox(height: 100.h),
+              SizedBox(height: 64.h),
+              ScanQrButton(onTap: () => _navigateToScanner(context)),
             ],
           ),
         ),
-      ),
-      bottomSheet: PrepBottomButton(
-        onPressed: () => _navigateToScanner(context),
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/theme/colors/app_colors.dart';
 import '../../../../core/theme/typography/app_typography.dart';
+import 'info_chip.dart';
 
 class EventInfoCard extends StatelessWidget {
   final String eventName;
@@ -98,37 +99,15 @@ class EventInfoCard extends StatelessWidget {
           SizedBox(height: 16.h),
           Row(
             children: [
-              _InfoChip(icon: Icons.calendar_today_rounded, label: date),
+              InfoChip(icon: Icons.calendar_today_rounded, label: date),
               SizedBox(width: 12.w),
-              _InfoChip(icon: Icons.access_time_rounded, label: time),
+              InfoChip(icon: Icons.access_time_rounded, label: time),
             ],
           ),
           SizedBox(height: 10.h),
-          _InfoChip(icon: Icons.door_front_door_rounded, label: gateNumber),
+          InfoChip(icon: Icons.door_front_door_rounded, label: gateNumber),
         ],
       ),
-    );
-  }
-}
-
-class _InfoChip extends StatelessWidget {
-  final IconData icon;
-  final String label;
-
-  const _InfoChip({required this.icon, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, color: Colors.white60, size: 12.r),
-        SizedBox(width: 6.w),
-        Text(
-          label,
-          style: AppTypography.regular12.copyWith(color: Colors.white70),
-        ),
-      ],
     );
   }
 }

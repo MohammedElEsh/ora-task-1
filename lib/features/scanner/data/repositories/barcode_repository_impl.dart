@@ -26,4 +26,10 @@ class BarcodeRepositoryImpl implements BarcodeRepository {
     LoggerService.d('getAllBarcodes', tag: _tag);
     return await _database.getAllBarcodes();
   }
+
+  @override
+  Future<Map<String, int>> getBarcodeStats() async {
+    LoggerService.d('getBarcodeStats', tag: _tag);
+    return await _database.getBarcodeStats();
+  }
 }

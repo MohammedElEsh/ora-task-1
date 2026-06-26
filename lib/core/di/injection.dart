@@ -18,5 +18,7 @@ void initDependencies() {
   LoggerService.d('Registered BarcodeRepository');
   sl.registerFactory<ScannerCubit>(() => ScannerCubit(sl<BarcodeRepository>()));
   LoggerService.d('Registered ScannerCubit');
+  sl.registerFactory<TestQrCubit>(() => TestQrCubit(sl<BarcodeRepository>()));
+  LoggerService.d('Registered TestQrCubit');
   LoggerService.i('All dependencies registered');
 }

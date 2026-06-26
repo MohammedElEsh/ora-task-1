@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/theme/colors/app_colors.dart';
 import '../../../../core/theme/typography/app_typography.dart';
 import '../manager/scanner_state.dart';
+import 'detail_row.dart';
 
 class ScanResultOverlay extends StatelessWidget {
   final ScannerState state;
@@ -104,14 +105,14 @@ class ScanResultOverlay extends StatelessWidget {
     return Column(
       children: [
         if (config.ticketCode.isNotEmpty)
-          _DetailRow(
+          DetailRow(
             icon: Icons.confirmation_number_rounded,
             label: 'Ticket Code',
             value: config.ticketCode,
           ),
         if (config.holderName != null) ...[
           SizedBox(height: 8.h),
-          _DetailRow(
+          DetailRow(
             icon: Icons.person_outline_rounded,
             label: 'Attendee',
             value: config.holderName!,
@@ -119,7 +120,7 @@ class ScanResultOverlay extends StatelessWidget {
         ],
         if (config.ticketType != null) ...[
           SizedBox(height: 8.h),
-          _DetailRow(
+          DetailRow(
             icon: Icons.local_activity_rounded,
             label: 'Ticket Type',
             value: config.ticketType!,
@@ -127,48 +128,12 @@ class ScanResultOverlay extends StatelessWidget {
         ],
         if (config.timestamp != null) ...[
           SizedBox(height: 8.h),
-          _DetailRow(
+          DetailRow(
             icon: Icons.access_time_rounded,
             label: 'Scanned at',
             value: config.timestamp!,
           ),
         ],
-      ],
-    );
-  }
-}
-
-class _DetailRow extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
-
-  const _DetailRow({
-    required this.icon,
-    required this.label,
-    required this.value,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, color: AppColors.grey400, size: 16.r),
-        SizedBox(width: 10.w),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              value,
-              style: AppTypography.medium14.copyWith(color: AppColors.grey800),
-            ),
-            Text(
-              label,
-              style: AppTypography.regular11.copyWith(color: AppColors.grey400),
-            ),
-          ],
-        ),
       ],
     );
   }

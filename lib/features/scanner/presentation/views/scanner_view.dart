@@ -6,10 +6,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
-import '../../../../core/di/injection.dart';
 import '../../../../core/services/logger/logger_service.dart';
 import '../../../../core/theme/colors/app_colors.dart';
-import '../../data/repositories/barcode_repository.dart';
 import '../manager/scanner_cubit.dart';
 import '../manager/scanner_state.dart';
 import '../widgets/scan_instruction.dart';
@@ -29,9 +27,8 @@ class ScannerView extends StatefulWidget {
 class _ScannerViewState extends State<ScannerView> {
   static const _tag = 'ScannerView';
   late MobileScannerController _controller;
+  late final ScannerCubit _cubit;
   bool _isScannerActive = true;
-  int _scannedToday = 0;
-  int _totalScanned = 0;
   bool _isProcessing = false;
   Timer? _resultTimer;
   Timer? _cooldownTimer;
@@ -42,6 +39,7 @@ class _ScannerViewState extends State<ScannerView> {
   void initState() {
     super.initState();
     LoggerService.i('ScannerView initialized', tag: _tag);
+    _cubit = context.read<ScannerCubit>();
     _controller = MobileScannerController(
       detectionSpeed: DetectionSpeed.normal,
       facing: CameraFacing.back,
@@ -49,7 +47,7 @@ class _ScannerViewState extends State<ScannerView> {
       autoStart: true,
     );
     _isScannerActive = true;
-    _loadStats();
+    _cubit.loadStats();
   }
 
   @override
@@ -59,31 +57,6 @@ class _ScannerViewState extends State<ScannerView> {
     _cooldownTimer?.cancel();
     _controller.dispose();
     super.dispose();
-  }
-
-  Future<void> _loadStats() async {
-    LoggerService.d('Loading scan stats', tag: _tag);
-    try {
-      final barcodes = await sl<BarcodeRepository>().getAllBarcodes();
-      final today = DateTime.now();
-      final todayScanned = barcodes.where((b) {
-        if (!b.isUsed || b.usedAt == null) return false;
-        final usedDate = b.usedAt!;
-        return usedDate.year == today.year &&
-            usedDate.month == today.month &&
-            usedDate.day == today.day;
-      }).length;
-
-      if (mounted) {
-        setState(() {
-          _scannedToday = todayScanned;
-          _totalScanned = barcodes.where((b) => b.isUsed).length;
-        });
-        LoggerService.d('Stats loaded: today=$_scannedToday, total=$_totalScanned', tag: _tag);
-      }
-    } catch (e) {
-      LoggerService.e('Failed to load stats', error: e, tag: _tag);
-    }
   }
 
   void _onBarcodeDetected(BarcodeCapture capture) {
@@ -98,7 +71,7 @@ class _ScannerViewState extends State<ScannerView> {
     if (_isProcessing) return;
     LoggerService.i('Processing barcode: $code', tag: _tag);
     setState(() => _isProcessing = true);
-    context.read<ScannerCubit>().onBarcodeScanned(code);
+    _cubit.onBarcodeScanned(code);
   }
 
   void _playFeedback(ScannerState state) {
@@ -111,7 +84,7 @@ class _ScannerViewState extends State<ScannerView> {
 
   void _resetScan() {
     LoggerService.d('Resetting scanner', tag: _tag);
-    context.read<ScannerCubit>().resetScanner();
+    _cubit.resetScanner();
     setState(() {
       _isProcessing = false;
     });
@@ -128,6 +101,8 @@ class _ScannerViewState extends State<ScannerView> {
             setState(() {
               _frameBorderColor = Colors.white;
             });
+          } else if (state is ScannerStatsLoaded) {
+            return;
           } else if (state is ScanAccepted ||
               state is ScanAlreadyUsed ||
               state is ScanNotFound ||
@@ -136,10 +111,8 @@ class _ScannerViewState extends State<ScannerView> {
 
             Color newBorder;
             if (state is ScanAccepted) {
-              _loadStats();
               newBorder = AppColors.validGreen;
             } else if (state is ScanAlreadyUsed || state is ScanError) {
-              _loadStats();
               newBorder = AppColors.deniedRed;
             } else {
               newBorder = AppColors.invalidOrange;
@@ -152,7 +125,8 @@ class _ScannerViewState extends State<ScannerView> {
             _resultTimer?.cancel();
             _resultTimer = Timer(const Duration(seconds: 3), () {
               if (!mounted) return;
-              context.read<ScannerCubit>().resetScanner();
+              _cubit.resetScanner();
+              _cubit.loadStats();
               _cooldownTimer?.cancel();
               _cooldownTimer = Timer(const Duration(seconds: 1), () {
                 if (mounted) {
@@ -167,6 +141,9 @@ class _ScannerViewState extends State<ScannerView> {
         },
         child: BlocBuilder<ScannerCubit, ScannerState>(
           builder: (context, state) {
+            final scannedToday = state is ScannerStatsLoaded ? state.todayScanned : 0;
+            final totalScanned = state is ScannerStatsLoaded ? state.used : 0;
+
             return Stack(
               children: [
                 Positioned.fill(
@@ -225,8 +202,8 @@ class _ScannerViewState extends State<ScannerView> {
                   right: 0,
                   child: ScannerBottomBar(
                     isTorchOn: _controller.value.torchState == TorchState.on,
-                    scannedToday: _scannedToday,
-                    totalScanned: _totalScanned,
+                    scannedToday: scannedToday,
+                    totalScanned: totalScanned,
                     onToggleTorch: () async {
                       await _controller.toggleTorch();
                       setState(() {});

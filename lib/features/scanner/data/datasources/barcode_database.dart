@@ -9,7 +9,7 @@ class BarcodeDatabase {
   Database? _database;
 
   Future<Database> get database async {
-    _database = await _initDatabase();
+    _database ??= await _initDatabase();
     return _database!;
   }
 
@@ -213,5 +213,31 @@ class BarcodeDatabase {
     final maps = await db.query('barcodes', orderBy: 'created_at DESC');
     LoggerService.d('Found ${maps.length} barcodes', tag: _tag);
     return maps.map((map) => BarcodeModel.fromMap(map)).toList();
+  }
+
+  Future<Map<String, int>> getBarcodeStats() async {
+    LoggerService.d('Getting barcode stats', tag: _tag);
+    final db = await database;
+    final all = await db.query('barcodes');
+    final total = all.length;
+    final used = all.where((m) => (m['is_used'] as int) == 1).length;
+    final available = total - used;
+
+    final today = DateTime.now();
+    final todayScanned = all.where((m) {
+      if ((m['is_used'] as int) != 1 || m['used_at'] == null) return false;
+      final usedAt = DateTime.fromMillisecondsSinceEpoch(m['used_at'] as int);
+      return usedAt.year == today.year &&
+          usedAt.month == today.month &&
+          usedAt.day == today.day;
+    }).length;
+
+    LoggerService.d('Stats: total=$total, used=$used, available=$available, today=$todayScanned', tag: _tag);
+    return {
+      'total': total,
+      'used': used,
+      'available': available,
+      'todayScanned': todayScanned,
+    };
   }
 }
