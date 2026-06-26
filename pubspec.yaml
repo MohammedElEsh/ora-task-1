@@ -40,12 +40,22 @@ dependencies:
   equatable: ^2.0.8
   flutter_bloc: ^9.1.1
 
-#  Dependency Injection
+  #  Dependency Injection
   get_it: ^9.2.1
 
   # Utilities
   google_fonts: ^8.1.0
-  intl: ^0.20.2
+  intl: ^0.20.3
+
+  # Camera & Scanner
+  mobile_scanner: ^7.2.0
+
+  # Local DB
+  sqflite: 2.4.3
+  path: 1.9.1
+
+  # QR Display (for testing)
+  qr_flutter: ^4.1.0
 
 
 dev_dependencies:

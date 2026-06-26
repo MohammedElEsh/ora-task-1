@@ -8,5 +8,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await HiveStorageServiceImpl.init('tasks');
   initDependencies();
+
   runApp(const App());
 }

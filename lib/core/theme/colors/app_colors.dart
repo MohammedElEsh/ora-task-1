@@ -54,6 +54,20 @@ class AppColors {
   static const Color error15 = Color(0x26DC2626);
   static const Color warning10 = Color(0x1AD97706);
 
+  // Badge Colors
+  static const Color badgeOnline = Color(0xFF10B981);
+  static const Color badgeOnlineBg = Color(0xFFECFDF5);
+  static const Color badgeOffline = Color(0xFFF59E0B);
+  static const Color badgeOfflineBg = Color(0xFFFFFBEB);
+
+  // Scan Result Colors
+  static const Color validGreen = Color(0xFF059669);
+  static const Color validGreenBg = Color(0xFFF0FDF4);
+  static const Color deniedRed = Color(0xFFDC2626);
+  static const Color deniedRedBg = Color(0xFFFEF2F2);
+  static const Color invalidOrange = Color(0xFFD97706);
+  static const Color invalidOrangeBg = Color(0xFFFFFBEB);
+
   static const Color grey50 = Color(0xFFF8FAFC);
   static const Color grey100 = Color(0xFFF1F5F9);
   static const Color grey200 = Color(0xFFE2E8F0);
