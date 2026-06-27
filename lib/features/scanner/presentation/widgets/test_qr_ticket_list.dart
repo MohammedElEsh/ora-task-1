@@ -1,8 +1,3 @@
-/// Scrollable list of all barcodes shown in the test-QR bottom sheet.
-///
-/// Displays real barcodes from the database plus one hardcoded invalid
-/// entry ("TKT-999") at the bottom for testing not-found scenarios.
-/// Tapping a row pops the sheet and returns the barcode code.
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 

@@ -41,8 +41,8 @@ class _Painter extends CustomPainter {
     // Step 1: Draw the dark overlay everywhere
     // Then subtract the frame area to create a "window"
     final overlay = Path()
-      ..addRect(Rect.fromLTWH(0, 0, w, h))  // full screen
-      ..addRRect(frame);                       // frame cut-out
+      ..addRect(Rect.fromLTWH(0, 0, w, h)) // full screen
+      ..addRRect(frame); // frame cut-out
     canvas.drawPath(
       // reverseDifference = screen minus frame = overlay with hole
       Path.combine(PathOperation.reverseDifference, overlay, Path()),
@@ -71,8 +71,8 @@ class _Painter extends CustomPainter {
         width: len * 2,
         height: len * 2,
       ),
-      0,        // start angle
-      1.5708,   // sweep = 90 degrees
+      0, // start angle
+      1.5708, // sweep = 90 degrees
       false,
       cornerPaint,
     );
@@ -83,8 +83,8 @@ class _Painter extends CustomPainter {
         width: len * 2,
         height: len * 2,
       ),
-      4.71239,  // 270 degrees
-      1.5708,   // sweep = 90 degrees
+      4.71239, // 270 degrees
+      1.5708, // sweep = 90 degrees
       false,
       cornerPaint,
     );
@@ -95,8 +95,8 @@ class _Painter extends CustomPainter {
         width: len * 2,
         height: len * 2,
       ),
-      1.5708,   // 90 degrees
-      1.5708,   // sweep = 90 degrees
+      1.5708, // 90 degrees
+      1.5708, // sweep = 90 degrees
       false,
       cornerPaint,
     );
@@ -107,8 +107,8 @@ class _Painter extends CustomPainter {
         width: len * 2,
         height: len * 2,
       ),
-      3.14159,  // 180 degrees
-      1.5708,   // sweep = 90 degrees
+      3.14159, // 180 degrees
+      1.5708, // sweep = 90 degrees
       false,
       cornerPaint,
     );

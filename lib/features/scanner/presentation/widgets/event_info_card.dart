@@ -1,5 +1,3 @@
-/// Card that displays event metadata (name, venue, date, time, gate).
-/// Used on the home screen to give context about the current scanning session.
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 

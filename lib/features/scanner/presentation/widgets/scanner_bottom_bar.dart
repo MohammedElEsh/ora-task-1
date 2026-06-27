@@ -1,7 +1,3 @@
-/// Bottom bar of the scanner screen with torch toggle and test-QR button.
-///
-/// Displays the daily scan counter in the centre and two icon buttons
-/// on either side: torch on/off (left) and test-QR sheet (right).
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -27,27 +23,46 @@ class ScannerBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    LoggerService.d('Building: torch=$isTorchOn, today=$scannedToday, total=$totalScanned', tag: 'ScannerBottomBar');
+    LoggerService.d(
+      'Building: torch=$isTorchOn, today=$scannedToday, total=$totalScanned',
+      tag: 'ScannerBottomBar',
+    );
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
         // Rounded top corners
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
         // Shadow above the bar
-        boxShadow: const [BoxShadow(color: AppColors.shadow, blurRadius: 20, offset: Offset(0, -5))],
+        boxShadow: const [
+          BoxShadow(
+            color: AppColors.shadow,
+            blurRadius: 20,
+            offset: Offset(0, -5),
+          ),
+        ],
       ),
       // Account for bottom system insets (notch, gesture bar)
-      padding: EdgeInsets.only(top: 16.h, bottom: MediaQuery.of(context).padding.bottom + 16.h, left: 20.w, right: 20.w),
+      padding: EdgeInsets.only(
+        top: 16.h,
+        bottom: MediaQuery.of(context).padding.bottom + 16.h,
+        left: 20.w,
+        right: 20.w,
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // Left: Torch toggle button
           _iconBtn(
-            icon: isTorchOn ? Icons.flashlight_on_rounded : Icons.flashlight_off_rounded,
+            icon: isTorchOn
+                ? Icons.flashlight_on_rounded
+                : Icons.flashlight_off_rounded,
             label: 'Flash',
             isActive: isTorchOn,
             onTap: () {
-              LoggerService.d('Flash tapped (current: $isTorchOn)', tag: 'ScannerBottomBar');
+              LoggerService.d(
+                'Flash tapped (current: $isTorchOn)',
+                tag: 'ScannerBottomBar',
+              );
               onToggleTorch();
             },
           ),
@@ -58,10 +73,20 @@ class ScannerBottomBar extends StatelessWidget {
               // Big number — today's scans
               Text('$scannedToday', style: AppTypography.bold32),
               SizedBox(height: 2.h),
-              Text('scanned today', style: AppTypography.regular12.copyWith(color: AppColors.grey500)),
+              Text(
+                'scanned today',
+                style: AppTypography.regular12.copyWith(
+                  color: AppColors.grey500,
+                ),
+              ),
               SizedBox(height: 2.h),
               // Smaller text — total scans
-              Text('$totalScanned total', style: AppTypography.regular10.copyWith(color: AppColors.grey400)),
+              Text(
+                '$totalScanned total',
+                style: AppTypography.regular10.copyWith(
+                  color: AppColors.grey400,
+                ),
+              ),
             ],
           ),
           // Right: Test QR button
@@ -80,22 +105,42 @@ class ScannerBottomBar extends StatelessWidget {
 
   /// Icon button with label underneath (torch / test).
   /// [isActive] adds a blue tint when the torch is on.
-  Widget _iconBtn({required IconData icon, required String label, bool isActive = false, required VoidCallback onTap}) => GestureDetector(
+  Widget _iconBtn({
+    required IconData icon,
+    required String label,
+    bool isActive = false,
+    required VoidCallback onTap,
+  }) => GestureDetector(
     onTap: onTap,
     child: Container(
       padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
       decoration: BoxDecoration(
         // Active state: light blue background + blue border
-        color: isActive ? AppColors.primary.withValues(alpha: 0.1) : AppColors.grey50,
+        color: isActive
+            ? AppColors.primary.withValues(alpha: 0.1)
+            : AppColors.grey50,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: isActive ? AppColors.primary.withValues(alpha: 0.3) : AppColors.grey100),
+        border: Border.all(
+          color: isActive
+              ? AppColors.primary.withValues(alpha: 0.3)
+              : AppColors.grey100,
+        ),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: isActive ? AppColors.primary : AppColors.grey600, size: 22.r),
+          Icon(
+            icon,
+            color: isActive ? AppColors.primary : AppColors.grey600,
+            size: 22.r,
+          ),
           SizedBox(height: 4.h),
-          Text(label, style: AppTypography.medium11.copyWith(color: isActive ? AppColors.primary : AppColors.grey600)),
+          Text(
+            label,
+            style: AppTypography.medium11.copyWith(
+              color: isActive ? AppColors.primary : AppColors.grey600,
+            ),
+          ),
         ],
       ),
     ),

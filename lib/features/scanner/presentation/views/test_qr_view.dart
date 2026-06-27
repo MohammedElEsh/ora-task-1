@@ -1,8 +1,3 @@
-/// Bottom sheet for simulating a QR scan without a real camera.
-///
-/// Lists all barcodes from the database with their status (available / used)
-/// plus one hardcoded invalid code ("TKT-999"). Tapping a row pops the
-/// sheet and returns the selected code to [ScannerView] for processing.
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -24,7 +19,6 @@ class TestQrView extends StatelessWidget {
     LoggerService.d('TestQrView.build()', tag: 'TestQrView');
     return BlocProvider(
       create: (_) {
-        // Create a fresh TestQrCubit and load barcodes immediately
         LoggerService.i('Creating TestQrCubit', tag: 'TestQrView');
         return sl<TestQrCubit>()..loadBarcodes();
       },
@@ -40,7 +34,6 @@ class _SheetContent extends StatelessWidget {
   Widget build(BuildContext context) {
     LoggerService.d('_SheetContent.build()', tag: 'TestQrView');
     return Container(
-      // Limit height to 75% of screen so it doesn't cover everything
       constraints: BoxConstraints(
         maxHeight: MediaQuery.of(context).size.height * 0.75,
       ),
@@ -51,10 +44,9 @@ class _SheetContent extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _sheet(),      // Small drag handle at the top
-          _header(),     // "Test Scanner" title + subtitle
+          _sheet(),
+          _header(),
           SizedBox(height: 8.h),
-          // Available / Used / Invalid stat badges
           BlocBuilder<TestQrCubit, TestQrState>(
             builder: (context, state) {
               final s = state is TestQrLoaded ? state : null;
@@ -69,11 +61,9 @@ class _SheetContent extends StatelessWidget {
             },
           ),
           SizedBox(height: 8.h),
-          // Scrollable list of barcodes (or loading spinner / error)
           Flexible(
             child: BlocBuilder<TestQrCubit, TestQrState>(
               builder: (context, state) {
-                // Loading state → show spinner
                 if (state is TestQrLoading) {
                   LoggerService.d('Loading barcodes...', tag: 'TestQrView');
                   return SizedBox(
@@ -81,7 +71,6 @@ class _SheetContent extends StatelessWidget {
                     child: const Center(child: CircularProgressIndicator()),
                   );
                 }
-                // Loaded → show the ticket list
                 if (state is TestQrLoaded) {
                   LoggerService.d(
                     'Loaded ${state.barcodes.length} barcodes',
@@ -89,7 +78,6 @@ class _SheetContent extends StatelessWidget {
                   );
                   return TestQrTicketList(barcodes: state.barcodes);
                 }
-                // Error → show error icon + retry button
                 if (state is TestQrError) {
                   LoggerService.e('Error: ${state.message}', tag: 'TestQrView');
                   return SizedBox(
@@ -112,7 +100,6 @@ class _SheetContent extends StatelessWidget {
                                 'Retry tapped',
                                 tag: 'TestQrView',
                               );
-                              // Retry the load
                               context.read<TestQrCubit>().loadBarcodes();
                             },
                             child: const Text('Retry'),
@@ -122,7 +109,6 @@ class _SheetContent extends StatelessWidget {
                     ),
                   );
                 }
-                // Initial state → nothing visible
                 return const SizedBox.shrink();
               },
             ),
@@ -132,7 +118,6 @@ class _SheetContent extends StatelessWidget {
     );
   }
 
-  /// Small grey pill at the top — visual cue that the sheet is draggable
   Widget _sheet() => Padding(
     padding: EdgeInsets.only(top: 12.h),
     child: Container(
@@ -145,7 +130,6 @@ class _SheetContent extends StatelessWidget {
     ),
   );
 
-  /// Title: "Test Scanner" + subtitle
   Widget _header() => Padding(
     padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
     child: Column(
@@ -162,7 +146,6 @@ class _SheetContent extends StatelessWidget {
     ),
   );
 
-  /// Three stat badges: Available (green) / Used (red) / Invalid (orange)
   Widget _stats({required int available, required int used}) => Padding(
     padding: EdgeInsets.symmetric(horizontal: 24.w),
     child: Row(
@@ -185,7 +168,6 @@ class _SheetContent extends StatelessWidget {
           ),
         ),
         SizedBox(width: 12.w),
-        // Hardcoded "1" invalid ticket (TKT-999)
         const Expanded(
           child: StatBadge(
             count: 1,

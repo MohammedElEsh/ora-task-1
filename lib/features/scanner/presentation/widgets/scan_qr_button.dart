@@ -1,7 +1,3 @@
-/// Large circular scan button with animated press feedback.
-///
-/// Uses [AnimatedScale] for a subtle press-down effect and [HapticFeedback]
-/// on tap. Gradient shifts darker while pressed for extra tactile feel.
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,6 +7,7 @@ import '../../../../core/theme/colors/app_colors.dart';
 
 class ScanQrButton extends StatefulWidget {
   final VoidCallback onTap;
+
   const ScanQrButton({super.key, required this.onTap});
 
   @override
@@ -53,21 +50,35 @@ class _ScanQrButtonState extends State<ScanQrButton> {
             // Gradient shifts darker when pressed
             gradient: LinearGradient(
               colors: _pressed
-                  ? [const Color(0xFF1E3A8A), const Color(0xFF1E40AF), const Color(0xFF2563EB)]
-                  : [const Color(0xFF1E40AF), const Color(0xFF2563EB), const Color(0xFF3B82F6)],
+                  ? [
+                      const Color(0xFF1E3A8A),
+                      const Color(0xFF1E40AF),
+                      const Color(0xFF2563EB),
+                    ]
+                  : [
+                      const Color(0xFF1E40AF),
+                      const Color(0xFF2563EB),
+                      const Color(0xFF3B82F6),
+                    ],
             ),
             borderRadius: BorderRadius.circular(32.r),
             // Shadow shrinks when pressed (button feels "closer" to screen)
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withValues(alpha: _pressed ? 0.3 : 0.5),
+                color: AppColors.primary.withValues(
+                  alpha: _pressed ? 0.3 : 0.5,
+                ),
                 blurRadius: _pressed ? 16 : 24,
                 spreadRadius: -2,
                 offset: Offset(0, _pressed ? 4 : 8),
               ),
             ],
           ),
-          child: Icon(Icons.qr_code_scanner_rounded, color: Colors.white, size: 64.r),
+          child: Icon(
+            Icons.qr_code_scanner_rounded,
+            color: Colors.white,
+            size: 64.r,
+          ),
         ),
       ),
     );
