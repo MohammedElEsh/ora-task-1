@@ -26,12 +26,10 @@ class EventInfoCard extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.all(20.r),
       decoration: BoxDecoration(
-        // Blue gradient background
         gradient: const LinearGradient(
           colors: [AppColors.primary, AppColors.primaryDark],
         ),
         borderRadius: BorderRadius.circular(16.r),
-        // Glow effect under the card
         boxShadow: [
           BoxShadow(
             color: AppColors.primary.withValues(alpha: 0.3),
@@ -43,7 +41,6 @@ class EventInfoCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top row: "LIVE EVENT" badge + verified icon
           Row(
             children: [
               Container(
@@ -69,13 +66,11 @@ class EventInfoCard extends StatelessWidget {
             ],
           ),
           SizedBox(height: 16.h),
-          // Event name (large white text)
           Text(
             eventName,
             style: AppTypography.semiBold20.copyWith(color: Colors.white),
           ),
           SizedBox(height: 8.h),
-          // Venue with location pin icon
           Row(
             children: [
               Icon(
@@ -97,10 +92,8 @@ class EventInfoCard extends StatelessWidget {
             ],
           ),
           SizedBox(height: 16.h),
-          // Thin white divider
           Divider(color: Colors.white.withValues(alpha: 0.2), height: 1),
           SizedBox(height: 16.h),
-          // Date + Time chips
           Row(
             children: [
               _chip(icon: Icons.calendar_today_rounded, label: date),
@@ -109,14 +102,13 @@ class EventInfoCard extends StatelessWidget {
             ],
           ),
           SizedBox(height: 10.h),
-          // Gate number chip
           _chip(icon: Icons.door_front_door_rounded, label: gateNumber),
         ],
       ),
     );
   }
 
-  /// Small row with an icon + text label (used for date, time, gate)
+  /// Used for date, time, gate
   Widget _chip({required IconData icon, required String label}) => Row(
     mainAxisSize: MainAxisSize.min,
     children: [

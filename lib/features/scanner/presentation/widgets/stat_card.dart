@@ -4,8 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/theme/colors/app_colors.dart';
 import '../../../../core/theme/typography/app_typography.dart';
 
-/// Large stat card shown on the home screen.
-/// Displays an icon, a big number, and a label.
+
 class StatCard extends StatelessWidget {
   final String title; // e.g. "Total", "Used", "Available"
   final String value; // the number to display
@@ -30,7 +29,6 @@ class StatCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(14.r),
         border: Border.all(color: AppColors.grey100),
-        // Subtle shadow under the card
         boxShadow: const [
           BoxShadow(
             color: AppColors.shadowLight,
@@ -42,7 +40,6 @@ class StatCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Coloured icon circle
           Container(
             width: 36.r,
             height: 36.r,
@@ -53,10 +50,8 @@ class StatCard extends StatelessWidget {
             child: Icon(icon, color: color, size: 18.r),
           ),
           SizedBox(height: 12.h),
-          // Big number
           Text(value, style: AppTypography.bold28),
           SizedBox(height: 4.h),
-          // Label underneath
           Text(
             title,
             style: AppTypography.regular12.copyWith(color: AppColors.grey500),
@@ -67,8 +62,7 @@ class StatCard extends StatelessWidget {
   }
 }
 
-/// Compact stat badge used in the test-QR bottom sheet.
-/// Shows "count + label" in a rounded coloured container.
+
 class StatBadge extends StatelessWidget {
   final int count; // number to display
   final String label; // e.g. "Available", "Used", "Invalid"
@@ -95,13 +89,11 @@ class StatBadge extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Count number
           Text(
             '$count',
             style: AppTypography.semiBold14.copyWith(color: color),
           ),
           SizedBox(width: 4.w),
-          // Label (flexible to prevent overflow on long text)
           Flexible(
             child: Text(
               label,

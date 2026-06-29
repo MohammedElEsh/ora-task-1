@@ -20,25 +20,21 @@ class _ScanQrButtonState extends State<ScanQrButton> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      // User pressed down → shrink + darken
       onTapDown: (_) {
         LoggerService.d('ScanQrButton pressed down', tag: 'ScanQrButton');
         setState(() => _pressed = true);
       },
-      // User lifted finger → trigger haptic + callback + reset
       onTapUp: (_) {
         LoggerService.d('ScanQrButton tapped', tag: 'ScanQrButton');
         setState(() => _pressed = false);
         HapticFeedback.mediumImpact(); // vibration feedback
         widget.onTap();
       },
-      // User dragged away → cancel press
       onTapCancel: () {
         LoggerService.d('ScanQrButton press cancelled', tag: 'ScanQrButton');
         setState(() => _pressed = false);
       },
       child: AnimatedScale(
-        // Shrink to 90% when pressed, normal when released
         scale: _pressed ? 0.9 : 1.0,
         duration: const Duration(milliseconds: 100),
         curve: Curves.easeOutCubic,
@@ -47,7 +43,6 @@ class _ScanQrButtonState extends State<ScanQrButton> {
           height: 140.r,
           margin: EdgeInsets.only(bottom: 8.h),
           decoration: BoxDecoration(
-            // Gradient shifts darker when pressed
             gradient: LinearGradient(
               colors: _pressed
                   ? [
@@ -62,7 +57,6 @@ class _ScanQrButtonState extends State<ScanQrButton> {
                     ],
             ),
             borderRadius: BorderRadius.circular(32.r),
-            // Shadow shrinks when pressed (button feels "closer" to screen)
             boxShadow: [
               BoxShadow(
                 color: AppColors.primary.withValues(

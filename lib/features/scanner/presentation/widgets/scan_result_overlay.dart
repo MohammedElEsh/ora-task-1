@@ -19,7 +19,7 @@ class ScanResultOverlay extends StatelessWidget {
     if (config == null) return const SizedBox.shrink();
 
     return GestureDetector(
-      onTap: onDismiss, // tap anywhere to dismiss
+      onTap: onDismiss,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOutCubic,
@@ -27,12 +27,10 @@ class ScanResultOverlay extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16.r),
-          // Border tinted with the result colour
           border: Border.all(
             color: config.$1.withValues(alpha: 0.3),
             width: 1.5,
           ),
-          // Subtle shadow with the same colour
           boxShadow: [
             BoxShadow(
               color: config.$1.withValues(alpha: 0.15),
@@ -44,10 +42,8 @@ class ScanResultOverlay extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Header row: icon + title + subtitle + expand arrow
             Row(
               children: [
-                // Coloured icon container
                 Container(
                   width: 44.r,
                   height: 44.r,
@@ -58,7 +54,6 @@ class ScanResultOverlay extends StatelessWidget {
                   child: Icon(config.$2, color: config.$1, size: 24.r),
                 ),
                 SizedBox(width: 12.w),
-                // Title + subtitle text
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,7 +82,6 @@ class ScanResultOverlay extends StatelessWidget {
                 ),
               ],
             ),
-            // Detail section (only for accepted / already used)
             if (config.$5) ...[
               SizedBox(height: 12.h),
               const Divider(color: AppColors.grey100, height: 1),
@@ -101,7 +95,6 @@ class ScanResultOverlay extends StatelessWidget {
   }
 
   /// Returns (colour, icon, title, subtitle, showDetails) for each state.
-  /// Returns null for initial/loading states (nothing to display).
   (Color, IconData, String, String, bool)? _config(ScannerState s) =>
       switch (s) {
         ScanAccepted() => (
@@ -192,7 +185,6 @@ class _Details extends StatelessWidget {
     };
   }
 
-  /// Single detail row: icon + label + value
   Widget _row({
     required IconData icon,
     required String label,

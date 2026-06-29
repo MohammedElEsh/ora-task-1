@@ -26,7 +26,6 @@ class TestQrTicketList extends StatelessWidget {
             holderName: 'Test User',
             ticketType: 'Invalid',
             status: 'Not Found',
-            // Pop the sheet and return "TKT-999" to the scanner
             onTap: () => Navigator.pop(context, 'TKT-999'),
           );
         }
@@ -37,7 +36,6 @@ class TestQrTicketList extends StatelessWidget {
           holderName: b.holderName,
           ticketType: b.ticketType,
           status: b.isUsed ? 'Used' : 'Available',
-          // Pop the sheet and return the barcode's code
           onTap: () => Navigator.pop(context, b.code),
         );
       },

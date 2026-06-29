@@ -24,7 +24,6 @@ class TestQrTicketRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Determine colour and label based on status string
     final (color, label) = switch (status) {
       'Used' => (AppColors.deniedRed, 'Used'),
       'Not Found' => (AppColors.invalidOrange, 'Invalid'),
@@ -37,7 +36,7 @@ class TestQrTicketRow extends StatelessWidget {
           'Ticket tapped: code=$code, status=$status',
           tag: 'TestQrTicketRow',
         );
-        onTap(); // triggers Navigator.pop with the code
+        onTap();
       },
       child: Container(
         padding: EdgeInsets.all(14.r),
@@ -55,10 +54,8 @@ class TestQrTicketRow extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // Small QR code thumbnail (coloured by status)
             _QrThumb(code: code, color: color),
             SizedBox(width: 14.w),
-            // Code + holder name + ticket type
             Expanded(
               child: _TicketInfo(
                 code: code,
@@ -69,7 +66,6 @@ class TestQrTicketRow extends StatelessWidget {
               ),
             ),
             SizedBox(width: 8.w),
-            // Forward arrow hint
             Icon(
               Icons.arrow_forward_ios_rounded,
               color: AppColors.grey300,
@@ -82,7 +78,6 @@ class TestQrTicketRow extends StatelessWidget {
   }
 }
 
-/// Mini QR code thumbnail with a coloured background.
 class _QrThumb extends StatelessWidget {
   final String code;
   final Color color;
@@ -94,7 +89,6 @@ class _QrThumb extends StatelessWidget {
     return Container(
       width: 44.r,
       height: 44.r,
-      // Light tinted background behind the QR code
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(10.r),
@@ -102,7 +96,6 @@ class _QrThumb extends StatelessWidget {
       child: QrImageView(
         data: code,
         version: QrVersions.auto,
-        // auto-size the QR modules
         size: 44.r,
         backgroundColor: Colors.white,
         eyeStyle: QrEyeStyle(eyeShape: QrEyeShape.square, color: color),
@@ -115,7 +108,6 @@ class _QrThumb extends StatelessWidget {
   }
 }
 
-/// Ticket info section: code + status badge + holder + type.
 class _TicketInfo extends StatelessWidget {
   final String code, holderName, ticketType, label;
   final Color color;
@@ -133,17 +125,14 @@ class _TicketInfo extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Row 1: Code + status badge
         Row(
           children: [
-            // Barcode code (e.g. "TKT-001")
             Expanded(
               child: Text(
                 code,
                 style: AppTypography.semiBold14.copyWith(letterSpacing: 0.5),
               ),
             ),
-            // Coloured badge: "Available" / "Used" / "Invalid"
             Container(
               padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
               decoration: BoxDecoration(
@@ -158,7 +147,6 @@ class _TicketInfo extends StatelessWidget {
           ],
         ),
         SizedBox(height: 6.h),
-        // Row 2: Person icon + holder name + ticket type pill
         Row(
           children: [
             Icon(
@@ -167,7 +155,6 @@ class _TicketInfo extends StatelessWidget {
               size: 12.r,
             ),
             SizedBox(width: 4.w),
-            // Holder name (truncated if too long)
             Expanded(
               child: Text(
                 holderName,
@@ -178,7 +165,6 @@ class _TicketInfo extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            // Small grey pill showing ticket type
             Container(
               padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
               decoration: BoxDecoration(

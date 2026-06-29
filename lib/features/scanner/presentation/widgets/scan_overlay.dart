@@ -1,24 +1,20 @@
-/// Semi-transparent camera overlay with a transparent cut-out for the scan frame.
-///
-/// The [borderColor] controls the frame border and corner accent colour —
-/// changes to green / red / orange to provide visual scan feedback.
-/// Painted via [CustomPaint] for performance.
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ScanOverlay extends StatelessWidget {
   final Color borderColor;
+
   const ScanOverlay({super.key, required this.borderColor});
 
   @override
   Widget build(BuildContext context) {
-    // Delegate all painting to _Painter for performance
     return CustomPaint(painter: _Painter(borderColor));
   }
 }
 
 class _Painter extends CustomPainter {
   final Color color;
+
   const _Painter(this.color);
 
   @override

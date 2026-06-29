@@ -30,9 +30,7 @@ class ScannerBottomBar extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        // Rounded top corners
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-        // Shadow above the bar
         boxShadow: const [
           BoxShadow(
             color: AppColors.shadow,
@@ -41,7 +39,6 @@ class ScannerBottomBar extends StatelessWidget {
           ),
         ],
       ),
-      // Account for bottom system insets (notch, gesture bar)
       padding: EdgeInsets.only(
         top: 16.h,
         bottom: MediaQuery.of(context).padding.bottom + 16.h,
@@ -51,7 +48,6 @@ class ScannerBottomBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Left: Torch toggle button
           _iconBtn(
             icon: isTorchOn
                 ? Icons.flashlight_on_rounded
@@ -66,11 +62,9 @@ class ScannerBottomBar extends StatelessWidget {
               onToggleTorch();
             },
           ),
-          // Centre: scan counter
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Big number — today's scans
               Text('$scannedToday', style: AppTypography.bold32),
               SizedBox(height: 2.h),
               Text(
@@ -80,7 +74,6 @@ class ScannerBottomBar extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 2.h),
-              // Smaller text — total scans
               Text(
                 '$totalScanned total',
                 style: AppTypography.regular10.copyWith(
@@ -89,7 +82,6 @@ class ScannerBottomBar extends StatelessWidget {
               ),
             ],
           ),
-          // Right: Test QR button
           _iconBtn(
             icon: Icons.grid_view_rounded,
             label: 'Test',
@@ -103,8 +95,6 @@ class ScannerBottomBar extends StatelessWidget {
     );
   }
 
-  /// Icon button with label underneath (torch / test).
-  /// [isActive] adds a blue tint when the torch is on.
   Widget _iconBtn({
     required IconData icon,
     required String label,
@@ -115,7 +105,6 @@ class ScannerBottomBar extends StatelessWidget {
     child: Container(
       padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
       decoration: BoxDecoration(
-        // Active state: light blue background + blue border
         color: isActive
             ? AppColors.primary.withValues(alpha: 0.1)
             : AppColors.grey50,

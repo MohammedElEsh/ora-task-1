@@ -29,14 +29,11 @@ class ScannerTopBar extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       child: Row(
         children: [
-          // Back button (arrow in dark container)
           _BackButton(onTap: onBack),
           SizedBox(width: 12.w),
-          // Event name + location badge (dark semi-transparent background)
           Expanded(
             child: _EventBadge(eventName: eventName, location: location),
           ),
-          // Pending sync counter (only shown if > 0)
           if (pendingSyncCount > 0) ...[
             SizedBox(width: 10.w),
             Container(
@@ -57,7 +54,6 @@ class ScannerTopBar extends StatelessWidget {
   }
 }
 
-/// Semi-transparent dark back button.
 class _BackButton extends StatelessWidget {
   final VoidCallback onTap;
 
@@ -87,7 +83,6 @@ class _BackButton extends StatelessWidget {
   }
 }
 
-/// Event badge: green dot + event name + location pin.
 class _EventBadge extends StatelessWidget {
   final String eventName;
   final String location;
@@ -104,7 +99,6 @@ class _EventBadge extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Green "online" indicator dot
           Container(
             width: 8.r,
             height: 8.r,
@@ -119,7 +113,6 @@ class _EventBadge extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Event name (white text, single line)
                 Text(
                   eventName,
                   style: AppTypography.semiBold14.copyWith(color: Colors.white),
@@ -127,7 +120,6 @@ class _EventBadge extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(height: 2.h),
-                // Location with pin icon
                 Row(
                   children: [
                     Icon(
